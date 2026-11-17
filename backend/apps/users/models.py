@@ -58,6 +58,12 @@ class Usuario(AbstractUser):
     def __str__(self):
         return self.email
 
+    def save(self, *args, **kwargs):
+        # `activo` (SPEC) es la fuente de verdad; se refleja en `is_active` para que
+        # la autenticación de Django y SimpleJWT rechacen cuentas desactivadas.
+        self.is_active = self.activo
+        super().save(*args, **kwargs)
+
     @property
     def puede_editar_portafolios(self):
         """Los usuarios VIEWER solo pueden consultar portafolios."""
