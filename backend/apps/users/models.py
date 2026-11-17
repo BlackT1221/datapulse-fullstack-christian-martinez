@@ -57,3 +57,8 @@ class Usuario(AbstractUser):
 
     def __str__(self):
         return self.email
+
+    @property
+    def puede_editar_portafolios(self):
+        """Los usuarios VIEWER solo pueden consultar portafolios."""
+        return self.rol != self.Rol.VIEWER
