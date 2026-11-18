@@ -1,6 +1,31 @@
-<mat-toolbar color="primary">
-  <span>{{ titulo }}</span>
+<app-loading-spinner modo="global" />
+
+<mat-toolbar class="barra">
+  <a class="marca" routerLink="/dashboard">
+    <mat-icon aria-hidden="true">monitoring</mat-icon>
+    <span>{{ titulo }}</span>
+  </a>
+  <span class="espaciador"></span>
+
+  @if (usuario$ | async; as usuario) {
+    <button mat-button [matMenuTriggerFor]="menuUsuario" aria-label="Menú de usuario">
+      <mat-icon>account_circle</mat-icon>
+      <span class="nombre-usuario">{{ usuario.nombre_completo }}</span>
+    </button>
+    <mat-menu #menuUsuario="matMenu" xPosition="before">
+      <div class="info-usuario" mat-menu-item disabled>
+        <span>{{ usuario.email }}</span>
+        <small>{{ etiquetasRol[usuario.rol] }}</small>
+      </div>
+      <mat-divider />
+      <button mat-menu-item type="button" (click)="cerrarSesion()">
+        <mat-icon>logout</mat-icon>
+        <span>Cerrar sesión</span>
+      </button>
+    </mat-menu>
+  }
 </mat-toolbar>
+
 <main class="contenido">
   <router-outlet />
 </main>
