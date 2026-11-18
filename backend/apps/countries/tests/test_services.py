@@ -8,7 +8,7 @@ import pytest
 import requests
 
 from apps.countries import services
-from apps.countries.models import IndicadorEconomico, Pais, TipoCambio
+from apps.countries.models import IndicadorEconomico, TipoCambio
 from apps.risk.models import Alerta
 
 
@@ -17,14 +17,6 @@ def _respuesta(datos):
     respuesta.json.return_value = datos
     respuesta.raise_for_status.return_value = None
     return respuesta
-
-
-@pytest.fixture
-def brasil(db):
-    return Pais.objects.create(
-        codigo_iso='BR', nombre='Brasil', moneda_codigo='BRL', moneda_nombre='Real brasileño',
-        region=Pais.Region.CONO_SUR, latitud=Decimal('-14.2350'), longitud=Decimal('-51.9253'),
-    )
 
 
 @pytest.fixture
