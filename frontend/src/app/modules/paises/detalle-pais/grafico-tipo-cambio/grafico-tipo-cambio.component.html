@@ -1,0 +1,53 @@
+<mat-card appearance="outlined" class="tarjeta">
+  <mat-card-header>
+    <mat-card-title>Tipo de cambio</mat-card-title>
+    <mat-card-subtitle>{{ moneda() }} por 1 USD · últimos 30 días</mat-card-subtitle>
+  </mat-card-header>
+  <mat-card-content>
+    @if (dolarizado()) {
+      <app-estado-carga
+        [vacio]="true"
+        mensajeVacio="Economía dolarizada: la moneda oficial es el dólar estadounidense, no aplica tipo de cambio."
+      />
+    } @else if (datos(); as d) {
+      <div class="resumen">
+        <div>
+          <span class="resumen__etiqueta">Última tasa</span>
+          <span class="resumen__valor">{{ tasaActual() }}</span>
+        </div>
+        <div>
+          <span class="resumen__etiqueta">Variación diaria</span>
+          <span class="resumen__valor resumen__valor--chico">
+            {{ ultimo()?.variacion_porcentual | porcentaje: 2 : true }}
+          </span>
+        </div>
+        <div>
+          <span class="resumen__etiqueta">Variación del periodo</span>
+          <span class="resumen__valor resumen__valor--chico">{{
+            variacionPeriodo() | porcentaje: 2 : true
+          }}</span>
+        </div>
+      </div>
+      <div class="lienzo">
+        <canvas
+          baseChart
+          type="line"
+          [data]="d"
+          [options]="opciones"
+          [plugins]="plugins"
+          role="img"
+          [attr.aria-label]="'Tipo de cambio ' + moneda() + ' por dólar, últimos 30 días'"
+        ></canvas>
+      </div>
+      <p class="nota">
+        <mat-icon aria-hidden="true">info</mat-icon>
+        Un aumento de la tasa indica depreciación del {{ moneda() }} frente al dólar.
+      </p>
+    } @else {
+      <app-estado-carga
+        [vacio]="true"
+        mensajeVacio="No hay histórico de tipo de cambio disponible."
+      />
+    }
+  </mat-card-content>
+</mat-card>

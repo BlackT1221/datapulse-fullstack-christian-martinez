@@ -1,0 +1,26 @@
+<div class="tarjetas">
+  @for (t of tarjetas(); track t.tipo) {
+    <mat-card appearance="outlined" class="tarjeta">
+      <div class="tarjeta__cabecera">
+        <span>{{ t.etiqueta }}</span>
+        <mat-icon aria-hidden="true">{{ t.icono }}</mat-icon>
+      </div>
+      @if (t.actual; as a) {
+        <span class="tarjeta__valor">{{ a.valor | valorIndicador: a.unidad }}</span>
+        <span class="tarjeta__pie">
+          {{ a.anio }}
+          @if (t.cambio; as c) {
+            ·
+            <mat-icon class="flecha" aria-hidden="true">
+              {{ c.valor > 0 ? 'arrow_upward' : c.valor < 0 ? 'arrow_downward' : 'remove' }}
+            </mat-icon>
+            {{ c.texto }} vs {{ c.anioAnterior }}
+          }
+        </span>
+      } @else {
+        <span class="tarjeta__valor tarjeta__valor--vacio">—</span>
+        <span class="tarjeta__pie">Sin datos disponibles</span>
+      }
+    </mat-card>
+  }
+</div>

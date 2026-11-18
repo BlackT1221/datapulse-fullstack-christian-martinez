@@ -1,0 +1,104 @@
+<mat-card appearance="outlined">
+  <mat-card-header>
+    <mat-card-title>Tendencias macroeconómicas</mat-card-title>
+    <mat-card-subtitle>Comparativo de hasta {{ maximo }} países · últimos 5 años</mat-card-subtitle>
+  </mat-card-header>
+  <mat-card-content>
+    <form class="filtros" [formGroup]="form" (submit)="$event.preventDefault()">
+      <mat-form-field appearance="outline" subscriptSizing="dynamic">
+        <mat-label>Indicador</mat-label>
+        <mat-select formControlName="tipo">
+          @for (item of indicadores; track item.tipo) {
+            <mat-option [value]="item.tipo">{{ item.etiqueta }}</mat-option>
+          }
+        </mat-select>
+      </mat-form-field>
+
+      <mat-form-field appearance="outline" subscriptSizing="dynamic" class="campo-paises">
+        <mat-label>Países (máx. {{ maximo }})</mat-label>
+        <mat-select formControlName="paises" multiple>
+          @for (pais of paises(); track pais.codigo_iso) {
+            <mat-option [value]="pais.codigo_iso" [disabled]="seleccionLlena(pais.codigo_iso)">
+              {{ pais.nombre }}
+            </mat-option>
+          }
+        </mat-select>
+        @if (form.controls.paises.hasError('required')) {
+          <mat-error>Selecciona al menos un país.</mat-error>
+        } @else if (form.controls.paises.hasError('maxPaises')) {
+          <mat-error>Puedes comparar como máximo {{ maximo }} países.</mat-error>
+        }
+      </mat-form-field>
+
+      <mat-button-toggle-group
+        class="vista"
+        [value]="vista()"
+        (change)="vista.set($event.value)"
+        aria-label="Vista de los datos"
+        hideSingleSelectionIndicator
+      >
+        <mat-button-toggle value="grafico">Gráfico</mat-button-toggle>
+        <mat-button-toggle value="tabla">Tabla</mat-button-toggle>
+      </mat-button-toggle-group>
+    </form>
+
+    <app-estado-carga
+      [cargando]="tendencias.isLoading()"
+      [error]="tendencias.status() === 'error'"
+      [vacio]="tendencias.hasValue() && sinDatos(tendencias.value())"
+      mensajeVacio="No hay datos de este indicador para los países seleccionados."
+      (reintentar)="tendencias.reload()"
+    />
+
+    @if (!tendencias.isLoading() && tendencias.hasValue() && !sinDatos(tendencias.value())) {
+      @let t = tendencias.value();
+      @if (vista() === 'grafico') {
+        @if (datos(); as d) {
+          <div class="lienzo">
+            <canvas
+              baseChart
+              type="line"
+              [data]="d"
+              [options]="opciones()"
+              [plugins]="plugins"
+              [attr.aria-label]="'Gráfico de ' + t.tipo_display + ' por país'"
+              role="img"
+            ></canvas>
+          </div>
+        }
+      } @else {
+        <div class="tabla-contenedor">
+          <table class="tabla-datos">
+            <caption class="oculto">
+              {{
+                t.tipo_display
+              }}
+              por país y año
+            </caption>
+            <thead>
+              <tr>
+                <th scope="col">País</th>
+                @for (anio of t.anios; track anio) {
+                  <th scope="col" class="num">{{ anio }}</th>
+                }
+              </tr>
+            </thead>
+            <tbody>
+              @for (serie of t.series; track serie.pais) {
+                <tr>
+                  <th scope="row">
+                    <span class="clave" [style.background-color]="colorDe(serie.pais)"></span>
+                    {{ serie.nombre }}
+                  </th>
+                  @for (valor of serie.valores; track $index) {
+                    <td class="num">{{ valor | valorIndicador: t.unidad }}</td>
+                  }
+                </tr>
+              }
+            </tbody>
+          </table>
+        </div>
+      }
+    }
+  </mat-card-content>
+</mat-card>

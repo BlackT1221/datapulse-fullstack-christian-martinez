@@ -17,6 +17,11 @@ export const routes: Routes = [
       import('./modules/dashboard/dashboard.routes').then((m) => m.DASHBOARD_ROUTES),
   },
   {
+    path: 'paises',
+    canActivate: [authGuard],
+    loadChildren: () => import('./modules/paises/paises.routes').then((m) => m.PAISES_ROUTES),
+  },
+  {
     path: '**',
     title: 'Página no encontrada · DataPulse Latam',
     loadComponent: () =>

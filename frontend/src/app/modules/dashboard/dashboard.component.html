@@ -1,0 +1,52 @@
+<header class="encabezado">
+  <div>
+    <h1>Panel de riesgo país</h1>
+    <p>Monitoreo del Índice de Riesgo País Compuesto (IRPC) en Latinoamérica</p>
+  </div>
+</header>
+
+<div class="dashboard">
+  <section class="area-kpis">
+    @if (resumen.hasValue()) {
+      <app-kpi-cards [resumen]="resumen.value()" />
+    } @else {
+      <app-estado-carga
+        [cargando]="resumen.isLoading()"
+        [error]="resumen.status() === 'error'"
+        (reintentar)="resumen.reload()"
+      />
+    }
+  </section>
+
+  <section class="area-mapa">
+    @if (mapa.hasValue()) {
+      <app-mapa-riesgo [paises]="mapa.value().paises" />
+    } @else {
+      <app-estado-carga
+        [cargando]="mapa.isLoading()"
+        [error]="mapa.status() === 'error'"
+        mensajeCarga="Cargando mapa..."
+        (reintentar)="mapa.reload()"
+      />
+    }
+  </section>
+
+  <section class="area-ranking">
+    @if (ranking.hasValue()) {
+      <app-tabla-ranking [ranking]="ranking.value()" />
+    } @else {
+      <app-estado-carga
+        [cargando]="ranking.isLoading()"
+        [error]="ranking.status() === 'error'"
+        mensajeCarga="Cargando ranking..."
+        (reintentar)="ranking.reload()"
+      />
+    }
+  </section>
+
+  <section class="area-tendencias">
+    @if (paisesMapa().length) {
+      <app-grafico-tendencias [paises]="paisesMapa()" />
+    }
+  </section>
+</div>

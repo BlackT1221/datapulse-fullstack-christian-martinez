@@ -1,0 +1,67 @@
+.kpis {
+  display: grid;
+  grid-template-columns: repeat(4, minmax(0, 1fr));
+  gap: 1rem;
+}
+
+.kpi {
+  display: flex;
+  flex-direction: column;
+  gap: 0.25rem;
+  padding: 1rem 1.25rem;
+}
+
+.kpi__cabecera {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  color: var(--mat-sys-on-surface-variant);
+
+  mat-icon {
+    color: var(--mat-sys-primary);
+  }
+}
+
+.kpi__titulo {
+  font: var(--mat-sys-title-small);
+}
+
+.kpi__valor {
+  font: var(--mat-sys-display-small);
+  font-weight: 500;
+  font-variant-numeric: tabular-nums;
+  color: var(--mat-sys-on-surface);
+
+  small {
+    font: var(--mat-sys-title-medium);
+    color: var(--mat-sys-on-surface-variant);
+    margin-left: 0.125rem;
+  }
+}
+
+.kpi__detalle {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.25rem;
+  font: var(--mat-sys-body-small);
+  color: var(--mat-sys-on-surface-variant);
+}
+
+.icono-critico {
+  font-size: 16px;
+  width: 16px;
+  height: 16px;
+  color: var(--mat-sys-error);
+}
+
+.punto {
+  width: 10px;
+  height: 10px;
+  border-radius: 50%;
+}
+
+@media (max-width: 1100px) {
+  .kpis {
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+  }
+}

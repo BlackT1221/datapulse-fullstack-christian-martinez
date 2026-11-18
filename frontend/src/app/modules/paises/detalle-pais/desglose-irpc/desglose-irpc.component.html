@@ -1,0 +1,77 @@
+<mat-card appearance="outlined">
+  <mat-card-header>
+    <mat-card-title>Desglose del IRPC</mat-card-title>
+    <mat-card-subtitle>
+      IRPC = Económico × 40 % + Cambiario × 30 % + Estabilidad × 30 % · calculado el
+      {{ riesgo().fecha_calculo | date: "d 'de' MMMM 'de' y, HH:mm" }}
+    </mat-card-subtitle>
+  </mat-card-header>
+  <mat-card-content>
+    <div class="desglose">
+      @for (t of tarjetas(); track t.titulo) {
+        <section class="score" [attr.aria-label]="'Score ' + t.titulo">
+          <header class="score__cabecera">
+            <span class="score__titulo">{{ t.titulo }}</span>
+            <span class="score__peso">peso {{ t.peso * 100 | number: '1.0-0' }} %</span>
+          </header>
+          <span class="score__valor">{{ t.score | number: '1.0-1' }}<small>/100</small></span>
+          <div
+            class="medidor"
+            role="meter"
+            aria-valuemin="0"
+            aria-valuemax="100"
+            [attr.aria-valuenow]="t.score"
+            [attr.aria-label]="'Score ' + t.titulo"
+          >
+            <span class="medidor__relleno" [style.width.%]="t.score"></span>
+          </div>
+          <span class="score__aporte">Aporta {{ t.aporte | number: '1.1-1' }} pts al IRPC</span>
+          <ul class="entradas">
+            @for (fila of t.filas; track fila.etiqueta) {
+              <li>
+                <span class="entradas__etiqueta">{{ fila.etiqueta }}</span>
+                <span class="entradas__valor">{{ fila.valor }}</span>
+                <span
+                  class="entradas__penalizacion"
+                  [class.entradas__penalizacion--cero]="fila.penalizacion === 0"
+                >
+                  {{ fila.penalizacion ? '−' + fila.penalizacion : '0' }}
+                </span>
+              </li>
+            }
+          </ul>
+        </section>
+      }
+
+      <section class="score score--compuesto" aria-label="Índice compuesto">
+        <header class="score__cabecera">
+          <span class="score__titulo">Índice compuesto</span>
+        </header>
+        <span class="score__valor score__valor--grande"
+          >{{ compuesto() | number: '1.1-1' }}<small>/100</small></span
+        >
+        <div
+          class="medidor medidor--escala"
+          role="meter"
+          aria-valuemin="0"
+          aria-valuemax="100"
+          [attr.aria-valuenow]="compuesto()"
+          aria-label="IRPC sobre la escala de riesgo"
+        >
+          <span class="medidor__marca" [style.left.%]="compuesto()"></span>
+        </div>
+        <span class="nivel">
+          <span class="punto" [style.background-color]="nivel().color"></span>
+          <strong>Riesgo {{ nivel().etiqueta.toLowerCase() }}</strong>
+        </span>
+        <p class="accion">{{ riesgo().accion_recomendada }}</p>
+        @if (faltantes().length) {
+          <p class="faltantes" role="note">
+            <mat-icon aria-hidden="true">warning</mat-icon>
+            Calculado con datos incompletos. Faltantes: {{ faltantes().join(', ') }}.
+          </p>
+        }
+      </section>
+    </div>
+  </mat-card-content>
+</mat-card>

@@ -1,0 +1,100 @@
+:host {
+  display: block;
+  height: 100%;
+}
+
+.tarjeta {
+  height: 100%;
+}
+
+.contenido {
+  overflow-x: auto;
+  padding-top: 0.5rem;
+}
+
+.tabla {
+  width: 100%;
+}
+
+.num {
+  text-align: right;
+  font-variant-numeric: tabular-nums;
+}
+
+.mat-mdc-header-cell.num {
+  text-align: right;
+}
+
+.fila {
+  cursor: pointer;
+
+  &:hover,
+  &:focus-visible {
+    background: var(--mat-sys-surface-container-high);
+    outline: none;
+  }
+}
+
+.pais,
+.nivel,
+.irpc {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.5rem;
+  white-space: nowrap;
+}
+
+.bandera {
+  width: 24px;
+  height: 16px;
+  object-fit: cover;
+  border-radius: 2px;
+  box-shadow: 0 0 0 1px rgb(0 0 0 / 12%);
+}
+
+.barra {
+  width: 56px;
+  height: 6px;
+  border-radius: 3px;
+  background: var(--mat-sys-surface-container-highest);
+  overflow: hidden;
+
+  &__relleno {
+    display: block;
+    height: 100%;
+    border-radius: 3px;
+    background: var(--mat-sys-primary);
+  }
+}
+
+.punto {
+  width: 10px;
+  height: 10px;
+  border-radius: 50%;
+}
+
+.tendencia {
+  vertical-align: middle;
+
+  &--sube {
+    color: #15803d;
+  }
+
+  &--baja {
+    color: var(--mat-sys-error);
+  }
+
+  &--estable {
+    color: var(--mat-sys-on-surface-variant);
+  }
+}
+
+.sin-dato {
+  color: var(--mat-sys-on-surface-variant);
+}
+
+@media (max-width: 1280px) {
+  .barra {
+    display: none;
+  }
+}

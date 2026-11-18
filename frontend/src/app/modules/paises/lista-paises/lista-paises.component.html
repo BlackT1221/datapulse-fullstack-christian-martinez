@@ -1,0 +1,158 @@
+<header class="encabezado">
+  <h1>Países monitoreados</h1>
+  <p>Indicadores macroeconómicos y riesgo país de los mercados latinoamericanos</p>
+</header>
+
+<mat-card appearance="outlined">
+  <mat-card-content>
+    <form class="filtros" [formGroup]="form" (submit)="$event.preventDefault()" role="search">
+      <mat-form-field appearance="outline" subscriptSizing="dynamic" class="busqueda">
+        <mat-label>Buscar país, código o moneda</mat-label>
+        <mat-icon matPrefix>search</mat-icon>
+        <input matInput formControlName="search" maxlength="60" autocomplete="off" />
+        @if (form.controls.search.value) {
+          <button
+            mat-icon-button
+            matSuffix
+            type="button"
+            aria-label="Limpiar búsqueda"
+            (click)="form.controls.search.setValue('')"
+          >
+            <mat-icon>close</mat-icon>
+          </button>
+        }
+      </mat-form-field>
+
+      <mat-form-field appearance="outline" subscriptSizing="dynamic">
+        <mat-label>Región</mat-label>
+        <mat-select formControlName="region">
+          <mat-option value="">Todas</mat-option>
+          @for (region of regiones; track region.valor) {
+            <mat-option [value]="region.valor">{{ region.etiqueta }}</mat-option>
+          }
+        </mat-select>
+      </mat-form-field>
+
+      @if (form.controls.search.value || form.controls.region.value) {
+        <button mat-button type="button" (click)="limpiar()">
+          <mat-icon>filter_alt_off</mat-icon>
+          Limpiar filtros
+        </button>
+      }
+    </form>
+
+    @if (paises.hasValue()) {
+      @let resultado = paises.value();
+      <div class="tabla-contenedor" [class.recargando]="paises.isLoading()">
+        <table
+          mat-table
+          [dataSource]="resultado.results"
+          matSort
+          [matSortActive]="orden().active"
+          [matSortDirection]="orden().direction"
+          (matSortChange)="ordenar($event)"
+          aria-label="Listado de países"
+        >
+          <ng-container matColumnDef="pais">
+            <th mat-header-cell *matHeaderCellDef mat-sort-header="nombre">País</th>
+            <td mat-cell *matCellDef="let pais">
+              <span class="pais">
+                @if (pais.bandera_url) {
+                  <img [src]="pais.bandera_url" alt="" class="bandera" loading="lazy" />
+                }
+                <span>
+                  {{ pais.nombre }}
+                  <small>{{ pais.codigo_iso }}</small>
+                </span>
+              </span>
+            </td>
+          </ng-container>
+
+          <ng-container matColumnDef="region">
+            <th mat-header-cell *matHeaderCellDef mat-sort-header="region">Región</th>
+            <td mat-cell *matCellDef="let pais">{{ etiquetaRegion(pais.region) }}</td>
+          </ng-container>
+
+          <ng-container matColumnDef="moneda">
+            <th mat-header-cell *matHeaderCellDef class="col-moneda">Moneda</th>
+            <td mat-cell *matCellDef="let pais" class="col-moneda">
+              {{ pais.moneda_codigo }} <small>{{ pais.moneda_nombre }}</small>
+            </td>
+          </ng-container>
+
+          <ng-container matColumnDef="poblacion">
+            <th
+              mat-header-cell
+              *matHeaderCellDef
+              mat-sort-header="poblacion"
+              arrowPosition="before"
+              class="num"
+            >
+              Población
+            </th>
+            <td mat-cell *matCellDef="let pais" class="num">
+              {{ pais.poblacion | numeroCompacto }}
+            </td>
+          </ng-container>
+
+          <ng-container matColumnDef="irpc">
+            <th
+              mat-header-cell
+              *matHeaderCellDef
+              mat-sort-header="irpc"
+              arrowPosition="before"
+              class="num"
+            >
+              IRPC
+            </th>
+            <td mat-cell *matCellDef="let pais" class="num">
+              {{ pais.irpc !== null ? (pais.irpc | number: '1.1-1') : '—' }}
+            </td>
+          </ng-container>
+
+          <ng-container matColumnDef="nivel">
+            <th mat-header-cell *matHeaderCellDef>Nivel de riesgo</th>
+            <td mat-cell *matCellDef="let pais">
+              <span class="nivel">
+                @if (pais.color_riesgo) {
+                  <span class="punto" [style.background-color]="pais.color_riesgo"></span>
+                }
+                {{ pais.nivel_riesgo | nivelRiesgo }}
+              </span>
+            </td>
+          </ng-container>
+
+          <tr mat-header-row *matHeaderRowDef="columnas"></tr>
+          <tr
+            mat-row
+            *matRowDef="let pais; columns: columnas"
+            class="fila"
+            tabindex="0"
+            (click)="verDetalle(pais)"
+            (keydown.enter)="verDetalle(pais)"
+          ></tr>
+          <tr class="mat-row" *matNoDataRow>
+            <td class="sin-resultados" [attr.colspan]="columnas.length">
+              No se encontraron países con los filtros aplicados.
+            </td>
+          </tr>
+        </table>
+      </div>
+      <mat-paginator
+        [length]="resultado.count"
+        [pageIndex]="pagina()"
+        [pageSize]="tamano()"
+        [pageSizeOptions]="[10, 20, 50]"
+        (page)="cambiarPagina($event)"
+        aria-label="Paginación de países"
+      />
+    } @else {
+      <app-estado-carga
+        [cargando]="paises.isLoading()"
+        [error]="paises.status() === 'error'"
+        mensajeCarga="Cargando países..."
+        (reintentar)="paises.reload()"
+      />
+    }
+  </mat-card-content>
+</mat-card>

@@ -5,6 +5,30 @@
     <mat-icon aria-hidden="true">monitoring</mat-icon>
     <span>{{ titulo }}</span>
   </a>
+  @if (usuario$ | async; as usuario) {
+    <nav class="navegacion" aria-label="Navegación principal">
+      <a
+        mat-button
+        routerLink="/dashboard"
+        routerLinkActive="activo"
+        ariaCurrentWhenActive="page"
+        aria-label="Dashboard"
+      >
+        <mat-icon>dashboard</mat-icon>
+        <span class="texto-nav">Dashboard</span>
+      </a>
+      <a
+        mat-button
+        routerLink="/paises"
+        routerLinkActive="activo"
+        ariaCurrentWhenActive="page"
+        aria-label="Países"
+      >
+        <mat-icon>public</mat-icon>
+        <span class="texto-nav">Países</span>
+      </a>
+    </nav>
+  }
   <span class="espaciador"></span>
 
   @if (usuario$ | async; as usuario) {

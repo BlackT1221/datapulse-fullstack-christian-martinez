@@ -5,9 +5,21 @@ export type NivelRiesgo = 'BAJO' | 'MODERADO' | 'ALTO' | 'CRITICO';
 export type Tendencia = 'SUBE' | 'BAJA' | 'ESTABLE';
 export type ScoreIrpc = 'score_economico' | 'score_cambiario' | 'score_estabilidad';
 
+/** Claves de entrada del motor IRPC (`apps.risk.irpc.UMBRALES`). */
+export type EntradaIrpc =
+  | 'PIB_PERCAPITA'
+  | 'INFLACION'
+  | 'DESEMPLEO'
+  | 'DEUDA_PIB'
+  | 'VOLATILIDAD'
+  | 'DEPRECIACION'
+  | 'BALANZA_COMERCIAL'
+  | 'CRECIMIENTO_PIB';
+
 export interface DetalleCalculoIrpc {
-  entradas: Record<string, number>;
-  penalizaciones: Record<string, unknown>;
+  entradas: Partial<Record<EntradaIrpc, number>>;
+  /** Puntos restados por entrada, más `INDICADORES_NEGATIVOS`. */
+  penalizaciones: Partial<Record<EntradaIrpc | 'INDICADORES_NEGATIVOS', number>>;
   indicadores_negativos: number;
   indicadores_faltantes: string[];
   datos_completos: boolean;

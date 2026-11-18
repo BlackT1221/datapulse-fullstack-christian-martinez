@@ -1,3 +1,4 @@
+import { HttpContext } from '@angular/common/http';
 import { inject, Injectable } from '@angular/core';
 import { Observable } from 'rxjs';
 
@@ -21,8 +22,9 @@ export class RiesgoService {
     return this.api.get<Paginado<RankingRiesgo>>('riesgo/', { params: filtros });
   }
 
-  detalle(codigoIso: string): Observable<RiesgoDetalle> {
-    return this.api.get<RiesgoDetalle>(`riesgo/${this.iso(codigoIso)}/`);
+  /** `contexto` permite, p. ej., silenciar el snackbar cuando un país aún no tiene IRPC (404). */
+  detalle(codigoIso: string, contexto?: HttpContext): Observable<RiesgoDetalle> {
+    return this.api.get<RiesgoDetalle>(`riesgo/${this.iso(codigoIso)}/`, { contexto });
   }
 
   historico(

@@ -58,3 +58,86 @@ body {
     --mat-snack-bar-button-color: #fde68a;
   }
 }
+
+// Popup del mapa Leaflet (contenido creado fuera de Angular: estilos globales).
+.popup-riesgo {
+  .leaflet-popup-content {
+    margin: 12px 14px;
+    font: var(--mat-sys-body-medium);
+  }
+}
+
+.popup-pais {
+  display: flex;
+  flex-direction: column;
+  gap: 0.375rem;
+  min-width: 190px;
+
+  &__cabecera {
+    display: flex;
+    align-items: center;
+    gap: 0.5rem;
+  }
+
+  &__bandera {
+    width: 28px;
+    height: 19px;
+    object-fit: cover;
+    border-radius: 2px;
+    box-shadow: 0 0 0 1px rgb(0 0 0 / 12%);
+  }
+
+  &__nombre {
+    font: var(--mat-sys-title-small);
+  }
+
+  &__irpc {
+    display: flex;
+    align-items: baseline;
+    gap: 0.5rem;
+  }
+
+  &__valor {
+    font: var(--mat-sys-headline-small);
+    font-weight: 500;
+  }
+
+  &__nivel {
+    display: inline-flex;
+    align-items: center;
+    gap: 0.25rem;
+    color: var(--mat-sys-on-surface-variant);
+  }
+
+  &__punto {
+    width: 10px;
+    height: 10px;
+    border-radius: 50%;
+  }
+
+  &__accion,
+  &__alertas {
+    margin: 0 !important;
+    color: var(--mat-sys-on-surface-variant);
+  }
+
+  &__alertas {
+    color: var(--mat-sys-error);
+  }
+
+  &__boton {
+    margin-top: 0.25rem;
+    padding: 0.4rem 0.75rem;
+    border: 1px solid var(--mat-sys-outline);
+    border-radius: 999px;
+    background: transparent;
+    color: var(--mat-sys-primary);
+    font: var(--mat-sys-label-large);
+    cursor: pointer;
+
+    &:hover,
+    &:focus-visible {
+      background: var(--mat-sys-primary-container);
+    }
+  }
+}

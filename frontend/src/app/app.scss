@@ -14,6 +14,16 @@
   text-decoration: none;
 }
 
+.navegacion {
+  display: flex;
+  gap: 0.25rem;
+  margin-left: 1.5rem;
+
+  .activo {
+    background: rgb(255 255 255 / 16%);
+  }
+}
+
 .espaciador {
   flex: 1 1 auto;
 }
@@ -40,8 +50,13 @@
 }
 
 @media (max-width: 768px) {
-  .nombre-usuario {
+  .nombre-usuario,
+  .texto-nav {
     display: none;
+  }
+
+  .navegacion {
+    margin-left: 0.5rem;
   }
 
   .contenido {

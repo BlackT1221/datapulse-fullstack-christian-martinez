@@ -1,0 +1,112 @@
+<a mat-button routerLink="/paises" class="volver">
+  <mat-icon>arrow_back</mat-icon>
+  Países
+</a>
+
+@if (pais.hasValue()) {
+  @let p = pais.value();
+  <header class="cabecera">
+    @if (p.bandera_url) {
+      <img class="bandera" [src]="p.bandera_url" [alt]="'Bandera de ' + p.nombre" />
+    }
+    <div class="identidad">
+      <h1>
+        {{ p.nombre }} <span class="iso">{{ p.codigo_iso }}</span>
+      </h1>
+      <dl class="datos">
+        <div>
+          <dt>Región</dt>
+          <dd>{{ region(p.region) }}</dd>
+        </div>
+        <div>
+          <dt>Moneda</dt>
+          <dd>{{ p.moneda_nombre }} ({{ p.moneda_codigo }})</dd>
+        </div>
+        <div>
+          <dt>Población</dt>
+          <dd>{{ p.poblacion | numeroCompacto }} hab.</dd>
+        </div>
+      </dl>
+    </div>
+    @if (p.nivel_riesgo && p.irpc !== null) {
+      @let n = nivel(p.nivel_riesgo);
+      <div class="irpc-resumen" aria-label="Índice de riesgo país compuesto">
+        <span class="irpc-resumen__titulo">IRPC</span>
+        <span class="irpc-resumen__valor">{{ p.irpc | number: '1.1-1' }}</span>
+        <span class="irpc-resumen__nivel">
+          <span class="punto" [style.background-color]="n.color"></span>
+          Riesgo {{ n.etiqueta.toLowerCase() }}
+        </span>
+      </div>
+    }
+  </header>
+
+  <div class="secciones">
+    <section class="area-indicadores" aria-label="Indicadores actuales">
+      @if (indicadores.hasValue()) {
+        <app-indicadores-pais [indicadores]="indicadores.value()" />
+      } @else {
+        <app-estado-carga
+          [cargando]="indicadores.isLoading()"
+          [error]="indicadores.status() === 'error'"
+          (reintentar)="indicadores.reload()"
+        />
+      }
+    </section>
+
+    <section class="area-historico">
+      @if (indicadores.hasValue()) {
+        <app-grafico-indicadores [indicadores]="indicadores.value()" />
+      }
+    </section>
+
+    <section class="area-cambio">
+      @if (tipoCambio.hasValue()) {
+        <app-grafico-tipo-cambio [serie]="tipoCambio.value()" [moneda]="p.moneda_codigo" />
+      } @else {
+        <app-estado-carga
+          [cargando]="tipoCambio.isLoading()"
+          [error]="tipoCambio.status() === 'error'"
+          (reintentar)="tipoCambio.reload()"
+        />
+      }
+    </section>
+
+    <section class="area-irpc">
+      @if (riesgo.hasValue()) {
+        @if (riesgo.value(); as r) {
+          <app-desglose-irpc [riesgo]="r" />
+          <app-tabla-historico-irpc [historico]="r.historico" />
+        } @else {
+          <mat-card appearance="outlined">
+            <mat-card-content>
+              <app-estado-carga
+                [vacio]="true"
+                mensajeVacio="Este país aún no tiene un IRPC calculado."
+              />
+            </mat-card-content>
+          </mat-card>
+        }
+      } @else {
+        <app-estado-carga
+          [cargando]="riesgo.isLoading()"
+          [error]="riesgo.status() === 'error'"
+          mensajeCarga="Cargando índice de riesgo..."
+          (reintentar)="riesgo.reload()"
+        />
+      }
+    </section>
+  </div>
+} @else {
+  <app-estado-carga
+    [cargando]="pais.isLoading()"
+    [error]="pais.status() === 'error'"
+    mensajeCarga="Cargando país..."
+    [mensajeError]="
+      'No se pudo cargar el país «' +
+      codigoIso().toUpperCase() +
+      '». Verifica el código o vuelve al listado.'
+    "
+    (reintentar)="pais.reload()"
+  />
+}

@@ -5,7 +5,7 @@ import { MatDividerModule } from '@angular/material/divider';
 import { MatIconModule } from '@angular/material/icon';
 import { MatMenuModule } from '@angular/material/menu';
 import { MatToolbarModule } from '@angular/material/toolbar';
-import { RouterLink, RouterOutlet } from '@angular/router';
+import { RouterLink, RouterLinkActive, RouterOutlet } from '@angular/router';
 
 import { AuthService } from './core/auth/services/auth.service';
 import { ETIQUETAS_ROL } from './core/models';
@@ -15,6 +15,7 @@ import { LoadingSpinnerComponent } from './shared/components/loading-spinner/loa
   imports: [
     AsyncPipe,
     RouterLink,
+    RouterLinkActive,
     RouterOutlet,
     MatButtonModule,
     MatDividerModule,

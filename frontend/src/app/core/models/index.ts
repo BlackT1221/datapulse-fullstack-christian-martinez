@@ -8,3 +8,4 @@ export * from './riesgo.model';
 export * from './tipo-cambio.model';
 export * from './usuario.model';
 export * from './catalogos';
+export * from './dashboard.model';
