@@ -3,6 +3,11 @@ Datos de referencia para `seed_data`.
 
 Países y coordenadas: SPEC §3.1. Indicadores: valores aproximados de World Bank (2021-2023)
 redondeados; los de Colombia 2023 reproducen el caso de prueba IRPC del SPEC §4.4.
+
+Escenarios de demostración (ajustados para que el mapa muestre varios niveles y se generen alertas):
+- Argentina: hiperinflación (133.5 %), contracción del PIB en USD en 2023 y ARS muy volátil con
+  devaluación sostenida → IRPC ALTO, alerta CRITICAL de hiperinflación y WARNING cambiarias.
+- Brasil: deuda > 80 % del PIB, inflación sobre 5 % y BRL volátil con depreciación → IRPC MODERADO.
 """
 
 ANIOS = (2021, 2022, 2023)
@@ -33,8 +38,8 @@ INDICADORES = {
     },
     'BR': {
         'PIB': (1_649.6e9, 1_951.9e9, 2_173.7e9), 'PIB_PERCAPITA': (7_700, 9_070, 10_040),
-        'INFLACION': (8.3, 9.3, 4.6), 'DESEMPLEO': (13.2, 9.2, 8.0),
-        'BALANZA_COMERCIAL': (0.6, 0.9, 2.4), 'DEUDA_PIB': (78.3, 72.9, 74.4),
+        'INFLACION': (8.3, 9.3, 5.8), 'DESEMPLEO': (13.2, 9.2, 8.0),
+        'BALANZA_COMERCIAL': (0.6, 0.9, 2.4), 'DEUDA_PIB': (80.3, 83.9, 84.7),
     },
     'MX': {
         'PIB': (1_312.6e9, 1_466.0e9, 1_789.1e9), 'PIB_PERCAPITA': (10_310, 11_500, 13_930),
@@ -42,7 +47,7 @@ INDICADORES = {
         'BALANZA_COMERCIAL': (-1.0, -1.9, -1.2), 'DEUDA_PIB': (50.8, 48.6, 49.0),
     },
     'AR': {
-        'PIB': (487.2e9, 631.1e9, 640.6e9), 'PIB_PERCAPITA': (10_740, 13_810, 13_990),
+        'PIB': (487.2e9, 631.1e9, 604.3e9), 'PIB_PERCAPITA': (10_740, 13_810, 13_990),
         'INFLACION': (48.4, 72.4, 133.5), 'DESEMPLEO': (8.7, 6.8, 6.1),
         'BALANZA_COMERCIAL': (2.3, 0.2, -1.1), 'DEUDA_PIB': (80.8, 84.5, 89.5),
     },
@@ -91,9 +96,9 @@ UNIDADES = {
 # moneda: (tasa_actual, volatilidad_diaria_%, deriva_diaria_%)
 TIPOS_CAMBIO = {
     'COP': (4_050.0, 0.70, 0.02),
-    'BRL': (5.45, 0.80, 0.03),
+    'BRL': (5.45, 1.80, 0.75),
     'MXN': (18.60, 0.60, 0.01),
-    'ARS': (1_020.0, 1.20, 0.30),
+    'ARS': (1_020.0, 2.00, 0.45),
     'CLP': (945.0, 0.65, 0.01),
     'PEN': (3.76, 0.30, 0.00),
     'USD': (1.0, 0.0, 0.0),

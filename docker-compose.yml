@@ -19,7 +19,10 @@ services:
       retries: 10
 
   backend:
-    build: ./backend
+    build:
+      context: ./backend
+      args:
+        INSTALL_DEV: ${INSTALL_DEV:-true}
     restart: unless-stopped
     env_file: .env
     volumes:

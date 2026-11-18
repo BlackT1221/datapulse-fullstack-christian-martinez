@@ -58,3 +58,35 @@ def test_seed_respeta_validaciones_de_negocio():
         activo = activas.aggregate(t=Sum('monto_inversion_usd'))['t']
         assert activo <= 50_000_000
     assert TipoCambio.objects.filter(moneda_origen_id='COP').count() == 30
+
+
+@pytest.mark.django_db
+def test_seed_calcula_indices_de_riesgo_idempotente():
+    from apps.risk.models import IndiceRiesgo
+
+    call_command('seed_data', verbosity=0)
+    call_command('seed_data', verbosity=0)
+    assert IndiceRiesgo.objects.count() == 10
+    paises_con_indice = set(IndiceRiesgo.objects.values_list('pais_id', flat=True))
+    assert paises_con_indice == set(Pais.objects.values_list('pk', flat=True))
+    for indice in IndiceRiesgo.objects.all():
+        assert 0 <= indice.indice_compuesto <= 100
+        assert indice.detalle_calculo['indicadores_faltantes'] == []
+
+
+@pytest.mark.django_db
+def test_seed_genera_variedad_de_niveles_y_alertas_sin_duplicar():
+    from apps.risk.models import Alerta, IndiceRiesgo
+
+    call_command('seed_data', verbosity=0)
+    alertas = Alerta.objects.count()
+    call_command('seed_data', verbosity=0)
+    assert Alerta.objects.count() == alertas
+
+    niveles = dict(IndiceRiesgo.objects.values_list('pais_id', 'nivel_riesgo'))
+    assert niveles['AR'] == 'ALTO'
+    assert niveles['BR'] == 'MODERADO'
+    assert {'BAJO', 'MODERADO', 'ALTO'} <= set(niveles.values())
+    assert Alerta.objects.filter(pais_id='AR', tipo_alerta='INDICADOR', severidad='CRITICAL').exists()
+    assert Alerta.objects.filter(tipo_alerta='TIPO_CAMBIO', severidad='WARNING').exists()
+    assert not Alerta.objects.filter(severidad='INFO').exists()

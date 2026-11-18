@@ -17,6 +17,8 @@ from django.utils import timezone
 from apps.core.seed import datos
 from apps.countries.models import IndicadorEconomico, Pais, TipoCambio
 from apps.portfolios.models import Portafolio, Posicion
+from apps.risk.models import Alerta
+from apps.risk.services import calcular_irpc_pais, generar_alerta_hiperinflacion, generar_alerta_tipo_cambio
 
 PASSWORD_POR_DEFECTO = 'DataPulse2026!'  # Credencial pública de demo definida en SPEC §6.3.
 
@@ -26,7 +28,10 @@ def _decimal(valor, decimales):
 
 
 class Command(BaseCommand):
-    help = 'Carga países, usuarios, indicadores, tipos de cambio y portafolios de ejemplo (idempotente).'
+    help = (
+        'Carga países, usuarios, indicadores, tipos de cambio, portafolios de ejemplo '
+        'índices de riesgo y alertas iniciales (idempotente).'
+    )
 
     @transaction.atomic
     def handle(self, *args, **options):
@@ -36,9 +41,12 @@ class Command(BaseCommand):
         indicadores = self._indicadores(paises)
         tipos_cambio = self._tipos_cambio(paises, hoy)
         portafolios, posiciones = self._portafolios(paises, usuarios, hoy)
+        indices = self._indices_riesgo(paises)
+        self._alertas_iniciales(paises)
         self.stdout.write(self.style.SUCCESS(
             f'Seed completado: {len(paises)} países, {len(usuarios)} usuarios, {indicadores} indicadores, '
-            f'{tipos_cambio} tipos de cambio, {portafolios} portafolios, {posiciones} posiciones.'
+            f'{tipos_cambio} tipos de cambio, {portafolios} portafolios, {posiciones} posiciones, '
+            f'{indices} índices de riesgo, {Alerta.objects.count()} alertas.'
         ))
 
     def _paises(self):
@@ -136,3 +144,25 @@ class Command(BaseCommand):
                 )
                 total_posiciones += 1
         return len(datos.PORTAFOLIOS), total_posiciones
+
+    def _indices_riesgo(self, paises):
+        """Cálculo inicial del IRPC; al re-ejecutar se actualiza el último índice en lugar de duplicarlo."""
+        for pais in paises.values():
+            calcular_irpc_pais(pais, reemplazar_ultimo=True)
+        return len(paises)
+
+    def _alertas_iniciales(self, paises):
+        """
+        Aplica a los datos precargados las reglas 3 (variación cambiaria > 3 %) y 5 (hiperinflación),
+        que en operación normal disparan las tareas de sincronización. Las reglas 1 y 2 ya las aplica
+        `calcular_irpc_pais`. Las alertas sin leer no se duplican al re-ejecutar el seed.
+        """
+        for tipo_cambio in TipoCambio.objects.filter(moneda_origen__in=paises.values()).select_related(
+            'moneda_origen'
+        ):
+            generar_alerta_tipo_cambio(tipo_cambio)
+        for pais in paises.values():
+            inflacion = (pais.indicadores.filter(tipo=IndicadorEconomico.Tipo.INFLACION)
+                         .order_by('-anio').first())
+            if inflacion is not None:
+                generar_alerta_hiperinflacion(inflacion)

@@ -7,8 +7,12 @@ ENV PYTHONDONTWRITEBYTECODE=1 \
 
 WORKDIR /app
 
-COPY requirements.txt .
-RUN pip install -r requirements.txt
+# INSTALL_DEV=true añade pytest, pytest-django y flake8 (docker-compose local lo activa por defecto);
+# el despliegue en nube construye con el valor por defecto y la imagen queda sin herramientas de test.
+ARG INSTALL_DEV=false
+COPY requirements.txt requirements-dev.txt ./
+RUN if [ "$INSTALL_DEV" = "true" ]; then pip install -r requirements-dev.txt; \
+    else pip install -r requirements.txt; fi
 
 COPY . .
 RUN chmod +x entrypoint.sh \
