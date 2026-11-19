@@ -1,0 +1,3141 @@
+{
+  "info": {
+    "_postman_id": "b2498afe-e16c-5f97-a7ff-d8a979235409",
+    "name": "DataPulse Latam API",
+    "description": "API REST de DataPulse Latam (Django + DRF).\n\n1. Ajusta `baseUrl` (por defecto `http://localhost:8000/api`).\n2. Ejecuta **Auth › Login** (analista, admin y viewer) para poblar los tokens.\n3. Recorre las carpetas en orden: las variables `portafolio_id`, `posicion_id`, `fecha_modificacion` y `alerta_id` se guardan automáticamente.\n\nLos ejemplos se generaron ejecutando los requests reales contra la base sembrada con `python manage.py seed_data` (listas recortadas a 3 elementos).\n\nDocumentación interactiva: `{{baseUrl}}/docs/` (Swagger) y `{{baseUrl}}/schema/` (OpenAPI).",
+    "schema": "https://schema.getpostman.com/json/collection/v2.1.0/collection.json"
+  },
+  "auth": {
+    "type": "bearer",
+    "bearer": [
+      {
+        "key": "token",
+        "value": "{{access_token}}",
+        "type": "string"
+      }
+    ]
+  },
+  "variable": [
+    {
+      "key": "baseUrl",
+      "value": "http://localhost:8000/api",
+      "type": "string"
+    },
+    {
+      "key": "access_token",
+      "value": "",
+      "type": "string"
+    },
+    {
+      "key": "refresh_token",
+      "value": "",
+      "type": "string"
+    },
+    {
+      "key": "admin_token",
+      "value": "",
+      "type": "string"
+    },
+    {
+      "key": "viewer_token",
+      "value": "",
+      "type": "string"
+    },
+    {
+      "key": "portafolio_id",
+      "value": "",
+      "type": "string"
+    },
+    {
+      "key": "posicion_id",
+      "value": "",
+      "type": "string"
+    },
+    {
+      "key": "fecha_modificacion",
+      "value": "",
+      "type": "string"
+    },
+    {
+      "key": "alerta_id",
+      "value": "",
+      "type": "string"
+    }
+  ],
+  "item": [
+    {
+      "name": "Auth",
+      "description": "Registro, login JWT, refresh y perfil.",
+      "item": [
+        {
+          "name": "Login (analista)",
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "url": {
+              "raw": "{{baseUrl}}/auth/login/",
+              "host": [
+                "{{baseUrl}}"
+              ],
+              "path": [
+                "auth",
+                "login",
+                ""
+              ]
+            },
+            "description": "Devuelve `access` + `refresh` y el usuario. Guarda los tokens en variables.",
+            "auth": {
+              "type": "noauth"
+            },
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"email\": \"analista@datapulse.com\",\n  \"password\": \"DataPulse2026!\"\n}",
+              "options": {
+                "raw": {
+                  "language": "json"
+                }
+              }
+            }
+          },
+          "response": [
+            {
+              "name": "Respuesta (200)",
+              "originalRequest": {
+                "method": "POST",
+                "header": [
+                  {
+                    "key": "Content-Type",
+                    "value": "application/json"
+                  }
+                ],
+                "url": {
+                  "raw": "{{baseUrl}}/auth/login/",
+                  "host": [
+                    "{{baseUrl}}"
+                  ],
+                  "path": [
+                    "auth",
+                    "login",
+                    ""
+                  ]
+                },
+                "auth": {
+                  "type": "noauth"
+                },
+                "body": {
+                  "mode": "raw",
+                  "raw": "{\n  \"email\": \"analista@datapulse.com\",\n  \"password\": \"DataPulse2026!\"\n}",
+                  "options": {
+                    "raw": {
+                      "language": "json"
+                    }
+                  }
+                }
+              },
+              "status": "OK",
+              "code": 200,
+              "_postman_previewlanguage": "json",
+              "header": [
+                {
+                  "key": "Content-Type",
+                  "value": "application/json"
+                }
+              ],
+              "body": "{\n  \"refresh\": \"{{refresh_token}}\",\n  \"access\": \"{{access_token}}\",\n  \"usuario\": {\n    \"id\": 2,\n    \"email\": \"analista@datapulse.com\",\n    \"nombre_completo\": \"Analista DataPulse\",\n    \"rol\": \"ANALISTA\",\n    \"activo\": true,\n    \"fecha_creacion\": \"2026-11-18T20:14:31.235882-05:00\"\n  }\n}"
+            }
+          ],
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "pm.test(\"Login correcto\", () => pm.response.to.have.status(200));",
+                  "const datos = pm.response.json();",
+                  "pm.collectionVariables.set(\"access_token\", datos.access);",
+                  "pm.collectionVariables.set(\"refresh_token\", datos.refresh);"
+                ]
+              }
+            }
+          ]
+        },
+        {
+          "name": "Login (admin)",
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "url": {
+              "raw": "{{baseUrl}}/auth/login/",
+              "host": [
+                "{{baseUrl}}"
+              ],
+              "path": [
+                "auth",
+                "login",
+                ""
+              ]
+            },
+            "description": "Guarda el access token en `admin_token`.",
+            "auth": {
+              "type": "noauth"
+            },
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"email\": \"admin@datapulse.com\",\n  \"password\": \"DataPulse2026!\"\n}",
+              "options": {
+                "raw": {
+                  "language": "json"
+                }
+              }
+            }
+          },
+          "response": [
+            {
+              "name": "Respuesta (200)",
+              "originalRequest": {
+                "method": "POST",
+                "header": [
+                  {
+                    "key": "Content-Type",
+                    "value": "application/json"
+                  }
+                ],
+                "url": {
+                  "raw": "{{baseUrl}}/auth/login/",
+                  "host": [
+                    "{{baseUrl}}"
+                  ],
+                  "path": [
+                    "auth",
+                    "login",
+                    ""
+                  ]
+                },
+                "auth": {
+                  "type": "noauth"
+                },
+                "body": {
+                  "mode": "raw",
+                  "raw": "{\n  \"email\": \"admin@datapulse.com\",\n  \"password\": \"DataPulse2026!\"\n}",
+                  "options": {
+                    "raw": {
+                      "language": "json"
+                    }
+                  }
+                }
+              },
+              "status": "OK",
+              "code": 200,
+              "_postman_previewlanguage": "json",
+              "header": [
+                {
+                  "key": "Content-Type",
+                  "value": "application/json"
+                }
+              ],
+              "body": "{\n  \"refresh\": \"{{refresh_token}}\",\n  \"access\": \"{{access_token}}\",\n  \"usuario\": {\n    \"id\": 1,\n    \"email\": \"admin@datapulse.com\",\n    \"nombre_completo\": \"Administrador DataPulse\",\n    \"rol\": \"ADMIN\",\n    \"activo\": true,\n    \"fecha_creacion\": \"2026-11-18T20:14:30.985846-05:00\"\n  }\n}"
+            }
+          ],
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "pm.test(\"Login correcto\", () => pm.response.to.have.status(200));",
+                  "const datos = pm.response.json();",
+                  "pm.collectionVariables.set(\"admin_access_token\", datos.access);",
+                  "pm.collectionVariables.set(\"admin_token\", datos.access);"
+                ]
+              }
+            }
+          ]
+        },
+        {
+          "name": "Login (viewer)",
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "url": {
+              "raw": "{{baseUrl}}/auth/login/",
+              "host": [
+                "{{baseUrl}}"
+              ],
+              "path": [
+                "auth",
+                "login",
+                ""
+              ]
+            },
+            "description": "Guarda el access token en `viewer_token`.",
+            "auth": {
+              "type": "noauth"
+            },
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"email\": \"viewer@datapulse.com\",\n  \"password\": \"DataPulse2026!\"\n}",
+              "options": {
+                "raw": {
+                  "language": "json"
+                }
+              }
+            }
+          },
+          "response": [
+            {
+              "name": "Respuesta (200)",
+              "originalRequest": {
+                "method": "POST",
+                "header": [
+                  {
+                    "key": "Content-Type",
+                    "value": "application/json"
+                  }
+                ],
+                "url": {
+                  "raw": "{{baseUrl}}/auth/login/",
+                  "host": [
+                    "{{baseUrl}}"
+                  ],
+                  "path": [
+                    "auth",
+                    "login",
+                    ""
+                  ]
+                },
+                "auth": {
+                  "type": "noauth"
+                },
+                "body": {
+                  "mode": "raw",
+                  "raw": "{\n  \"email\": \"viewer@datapulse.com\",\n  \"password\": \"DataPulse2026!\"\n}",
+                  "options": {
+                    "raw": {
+                      "language": "json"
+                    }
+                  }
+                }
+              },
+              "status": "OK",
+              "code": 200,
+              "_postman_previewlanguage": "json",
+              "header": [
+                {
+                  "key": "Content-Type",
+                  "value": "application/json"
+                }
+              ],
+              "body": "{\n  \"refresh\": \"{{refresh_token}}\",\n  \"access\": \"{{access_token}}\",\n  \"usuario\": {\n    \"id\": 3,\n    \"email\": \"viewer@datapulse.com\",\n    \"nombre_completo\": \"Visualizador DataPulse\",\n    \"rol\": \"VIEWER\",\n    \"activo\": true,\n    \"fecha_creacion\": \"2026-11-18T20:14:31.478688-05:00\"\n  }\n}"
+            }
+          ],
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "pm.test(\"Login correcto\", () => pm.response.to.have.status(200));",
+                  "const datos = pm.response.json();",
+                  "pm.collectionVariables.set(\"viewer_access_token\", datos.access);",
+                  "pm.collectionVariables.set(\"viewer_token\", datos.access);"
+                ]
+              }
+            }
+          ]
+        },
+        {
+          "name": "Login con credenciales inválidas",
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "url": {
+              "raw": "{{baseUrl}}/auth/login/",
+              "host": [
+                "{{baseUrl}}"
+              ],
+              "path": [
+                "auth",
+                "login",
+                ""
+              ]
+            },
+            "description": "",
+            "auth": {
+              "type": "noauth"
+            },
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"email\": \"analista@datapulse.com\",\n  \"password\": \"incorrecta\"\n}",
+              "options": {
+                "raw": {
+                  "language": "json"
+                }
+              }
+            }
+          },
+          "response": [
+            {
+              "name": "Error estándar (401)",
+              "originalRequest": {
+                "method": "POST",
+                "header": [
+                  {
+                    "key": "Content-Type",
+                    "value": "application/json"
+                  }
+                ],
+                "url": {
+                  "raw": "{{baseUrl}}/auth/login/",
+                  "host": [
+                    "{{baseUrl}}"
+                  ],
+                  "path": [
+                    "auth",
+                    "login",
+                    ""
+                  ]
+                },
+                "auth": {
+                  "type": "noauth"
+                },
+                "body": {
+                  "mode": "raw",
+                  "raw": "{\n  \"email\": \"analista@datapulse.com\",\n  \"password\": \"incorrecta\"\n}",
+                  "options": {
+                    "raw": {
+                      "language": "json"
+                    }
+                  }
+                }
+              },
+              "status": "Unauthorized",
+              "code": 401,
+              "_postman_previewlanguage": "json",
+              "header": [
+                {
+                  "key": "Content-Type",
+                  "value": "application/json"
+                }
+              ],
+              "body": "{\n  \"error\": true,\n  \"codigo\": 401,\n  \"mensaje\": \"Credenciales inválidas o cuenta inactiva.\",\n  \"detalles\": null\n}"
+            }
+          ]
+        },
+        {
+          "name": "Registro",
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "url": {
+              "raw": "{{baseUrl}}/auth/register/",
+              "host": [
+                "{{baseUrl}}"
+              ],
+              "path": [
+                "auth",
+                "register",
+                ""
+              ]
+            },
+            "description": "Autoregistro como `ANALISTA` o `VIEWER` (el rol `ADMIN` no se autoasigna).",
+            "auth": {
+              "type": "noauth"
+            },
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"email\": \"nuevo.analista@datapulse.com\",\n  \"nombre_completo\": \"Nuevo Analista\",\n  \"rol\": \"ANALISTA\",\n  \"password\": \"ClaveSegura2026!\",\n  \"password_confirmacion\": \"ClaveSegura2026!\"\n}",
+              "options": {
+                "raw": {
+                  "language": "json"
+                }
+              }
+            }
+          },
+          "response": [
+            {
+              "name": "Respuesta (201)",
+              "originalRequest": {
+                "method": "POST",
+                "header": [
+                  {
+                    "key": "Content-Type",
+                    "value": "application/json"
+                  }
+                ],
+                "url": {
+                  "raw": "{{baseUrl}}/auth/register/",
+                  "host": [
+                    "{{baseUrl}}"
+                  ],
+                  "path": [
+                    "auth",
+                    "register",
+                    ""
+                  ]
+                },
+                "auth": {
+                  "type": "noauth"
+                },
+                "body": {
+                  "mode": "raw",
+                  "raw": "{\n  \"email\": \"nuevo.analista@datapulse.com\",\n  \"nombre_completo\": \"Nuevo Analista\",\n  \"rol\": \"ANALISTA\",\n  \"password\": \"ClaveSegura2026!\",\n  \"password_confirmacion\": \"ClaveSegura2026!\"\n}",
+                  "options": {
+                    "raw": {
+                      "language": "json"
+                    }
+                  }
+                }
+              },
+              "status": "Created",
+              "code": 201,
+              "_postman_previewlanguage": "json",
+              "header": [
+                {
+                  "key": "Content-Type",
+                  "value": "application/json"
+                }
+              ],
+              "body": "{\n  \"usuario\": {\n    \"id\": 4,\n    \"email\": \"nuevo.analista@datapulse.com\",\n    \"nombre_completo\": \"Nuevo Analista\",\n    \"rol\": \"ANALISTA\",\n    \"activo\": true,\n    \"fecha_creacion\": \"2026-11-18T20:14:32.998824-05:00\"\n  },\n  \"access\": \"{{access_token}}\",\n  \"refresh\": \"{{refresh_token}}\"\n}"
+            }
+          ]
+        },
+        {
+          "name": "Registro con email existente",
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "url": {
+              "raw": "{{baseUrl}}/auth/register/",
+              "host": [
+                "{{baseUrl}}"
+              ],
+              "path": [
+                "auth",
+                "register",
+                ""
+              ]
+            },
+            "description": "",
+            "auth": {
+              "type": "noauth"
+            },
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"email\": \"analista@datapulse.com\",\n  \"nombre_completo\": \"Duplicado\",\n  \"rol\": \"VIEWER\",\n  \"password\": \"ClaveSegura2026!\",\n  \"password_confirmacion\": \"ClaveSegura2026!\"\n}",
+              "options": {
+                "raw": {
+                  "language": "json"
+                }
+              }
+            }
+          },
+          "response": [
+            {
+              "name": "Validación (400)",
+              "originalRequest": {
+                "method": "POST",
+                "header": [
+                  {
+                    "key": "Content-Type",
+                    "value": "application/json"
+                  }
+                ],
+                "url": {
+                  "raw": "{{baseUrl}}/auth/register/",
+                  "host": [
+                    "{{baseUrl}}"
+                  ],
+                  "path": [
+                    "auth",
+                    "register",
+                    ""
+                  ]
+                },
+                "auth": {
+                  "type": "noauth"
+                },
+                "body": {
+                  "mode": "raw",
+                  "raw": "{\n  \"email\": \"analista@datapulse.com\",\n  \"nombre_completo\": \"Duplicado\",\n  \"rol\": \"VIEWER\",\n  \"password\": \"ClaveSegura2026!\",\n  \"password_confirmacion\": \"ClaveSegura2026!\"\n}",
+                  "options": {
+                    "raw": {
+                      "language": "json"
+                    }
+                  }
+                }
+              },
+              "status": "Bad Request",
+              "code": 400,
+              "_postman_previewlanguage": "json",
+              "header": [
+                {
+                  "key": "Content-Type",
+                  "value": "application/json"
+                }
+              ],
+              "body": "{\n  \"error\": true,\n  \"codigo\": 400,\n  \"mensaje\": \"La solicitud contiene datos inválidos.\",\n  \"detalles\": {\n    \"email\": [\n      \"Ya existe usuario con este correo electrónico.\"\n    ]\n  }\n}"
+            }
+          ]
+        },
+        {
+          "name": "Refresh token",
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "url": {
+              "raw": "{{baseUrl}}/auth/refresh/",
+              "host": [
+                "{{baseUrl}}"
+              ],
+              "path": [
+                "auth",
+                "refresh",
+                ""
+              ]
+            },
+            "description": "",
+            "auth": {
+              "type": "noauth"
+            },
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"refresh\": \"{{refresh_token}}\"\n}",
+              "options": {
+                "raw": {
+                  "language": "json"
+                }
+              }
+            }
+          },
+          "response": [
+            {
+              "name": "Respuesta (200)",
+              "originalRequest": {
+                "method": "POST",
+                "header": [
+                  {
+                    "key": "Content-Type",
+                    "value": "application/json"
+                  }
+                ],
+                "url": {
+                  "raw": "{{baseUrl}}/auth/refresh/",
+                  "host": [
+                    "{{baseUrl}}"
+                  ],
+                  "path": [
+                    "auth",
+                    "refresh",
+                    ""
+                  ]
+                },
+                "auth": {
+                  "type": "noauth"
+                },
+                "body": {
+                  "mode": "raw",
+                  "raw": "{\n  \"refresh\": \"{{refresh_token}}\"\n}",
+                  "options": {
+                    "raw": {
+                      "language": "json"
+                    }
+                  }
+                }
+              },
+              "status": "OK",
+              "code": 200,
+              "_postman_previewlanguage": "json",
+              "header": [
+                {
+                  "key": "Content-Type",
+                  "value": "application/json"
+                }
+              ],
+              "body": "{\n  \"access\": \"{{access_token}}\"\n}"
+            }
+          ],
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "pm.collectionVariables.set(\"access_token\", pm.response.json().access);"
+                ]
+              }
+            }
+          ]
+        },
+        {
+          "name": "Mi perfil",
+          "request": {
+            "method": "GET",
+            "header": [],
+            "url": {
+              "raw": "{{baseUrl}}/auth/me/",
+              "host": [
+                "{{baseUrl}}"
+              ],
+              "path": [
+                "auth",
+                "me",
+                ""
+              ]
+            },
+            "description": ""
+          },
+          "response": [
+            {
+              "name": "Respuesta (200)",
+              "originalRequest": {
+                "method": "GET",
+                "header": [],
+                "url": {
+                  "raw": "{{baseUrl}}/auth/me/",
+                  "host": [
+                    "{{baseUrl}}"
+                  ],
+                  "path": [
+                    "auth",
+                    "me",
+                    ""
+                  ]
+                }
+              },
+              "status": "OK",
+              "code": 200,
+              "_postman_previewlanguage": "json",
+              "header": [
+                {
+                  "key": "Content-Type",
+                  "value": "application/json"
+                }
+              ],
+              "body": "{\n  \"id\": 2,\n  \"email\": \"analista@datapulse.com\",\n  \"nombre_completo\": \"Analista DataPulse\",\n  \"rol\": \"ANALISTA\",\n  \"activo\": true,\n  \"fecha_creacion\": \"2026-11-18T20:14:31.235882-05:00\"\n}"
+            }
+          ]
+        },
+        {
+          "name": "Actualizar perfil",
+          "request": {
+            "method": "PUT",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "url": {
+              "raw": "{{baseUrl}}/auth/me/",
+              "host": [
+                "{{baseUrl}}"
+              ],
+              "path": [
+                "auth",
+                "me",
+                ""
+              ]
+            },
+            "description": "",
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"nombre_completo\": \"Analista DataPulse\"\n}",
+              "options": {
+                "raw": {
+                  "language": "json"
+                }
+              }
+            }
+          },
+          "response": [
+            {
+              "name": "Respuesta (200)",
+              "originalRequest": {
+                "method": "PUT",
+                "header": [
+                  {
+                    "key": "Content-Type",
+                    "value": "application/json"
+                  }
+                ],
+                "url": {
+                  "raw": "{{baseUrl}}/auth/me/",
+                  "host": [
+                    "{{baseUrl}}"
+                  ],
+                  "path": [
+                    "auth",
+                    "me",
+                    ""
+                  ]
+                },
+                "body": {
+                  "mode": "raw",
+                  "raw": "{\n  \"nombre_completo\": \"Analista DataPulse\"\n}",
+                  "options": {
+                    "raw": {
+                      "language": "json"
+                    }
+                  }
+                }
+              },
+              "status": "OK",
+              "code": 200,
+              "_postman_previewlanguage": "json",
+              "header": [
+                {
+                  "key": "Content-Type",
+                  "value": "application/json"
+                }
+              ],
+              "body": "{\n  \"id\": 2,\n  \"email\": \"analista@datapulse.com\",\n  \"nombre_completo\": \"Analista DataPulse\",\n  \"rol\": \"ANALISTA\",\n  \"activo\": true,\n  \"fecha_creacion\": \"2026-11-18T20:14:31.235882-05:00\"\n}"
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "name": "Países e indicadores",
+      "description": "Catálogo de los 10 países, indicadores y tipo de cambio.",
+      "item": [
+        {
+          "name": "Listar países",
+          "request": {
+            "method": "GET",
+            "header": [],
+            "url": {
+              "raw": "{{baseUrl}}/paises/?region=ANDINA&ordering=nombre",
+              "host": [
+                "{{baseUrl}}"
+              ],
+              "path": [
+                "paises",
+                ""
+              ],
+              "query": [
+                {
+                  "key": "region",
+                  "value": "ANDINA"
+                },
+                {
+                  "key": "ordering",
+                  "value": "nombre"
+                }
+              ]
+            },
+            "description": ""
+          },
+          "response": [
+            {
+              "name": "Respuesta (200)",
+              "originalRequest": {
+                "method": "GET",
+                "header": [],
+                "url": {
+                  "raw": "{{baseUrl}}/paises/?region=ANDINA&ordering=nombre",
+                  "host": [
+                    "{{baseUrl}}"
+                  ],
+                  "path": [
+                    "paises",
+                    ""
+                  ],
+                  "query": [
+                    {
+                      "key": "region",
+                      "value": "ANDINA"
+                    },
+                    {
+                      "key": "ordering",
+                      "value": "nombre"
+                    }
+                  ]
+                }
+              },
+              "status": "OK",
+              "code": 200,
+              "_postman_previewlanguage": "json",
+              "header": [
+                {
+                  "key": "Content-Type",
+                  "value": "application/json"
+                }
+              ],
+              "body": "{\n  \"count\": 3,\n  \"next\": null,\n  \"previous\": null,\n  \"results\": [\n    {\n      \"codigo_iso\": \"CO\",\n      \"nombre\": \"Colombia\",\n      \"moneda_codigo\": \"COP\",\n      \"moneda_nombre\": \"Peso colombiano\",\n      \"region\": \"ANDINA\",\n      \"region_display\": \"Andina\",\n      \"latitud\": \"4.570900\",\n      \"longitud\": \"-74.297300\",\n      \"poblacion\": 52085168,\n      \"bandera_url\": \"https://flagcdn.com/w320/co.png\",\n      \"activo\": true,\n      \"irpc\": \"75.00\",\n      \"nivel_riesgo\": \"BAJO\",\n      \"color_riesgo\": \"#22c55e\"\n    },\n    {\n      \"codigo_iso\": \"EC\",\n      \"nombre\": \"Ecuador\",\n      \"moneda_codigo\": \"USD\",\n      \"moneda_nombre\": \"Dólar estadounidense\",\n      \"region\": \"ANDINA\",\n      \"region_display\": \"Andina\",\n      \"latitud\": \"-1.831200\",\n      \"longitud\": \"-78.183400\",\n      \"poblacion\": 18190484,\n      \"bandera_url\": \"https://flagcdn.com/w320/ec.png\",\n      \"activo\": true,\n      \"irpc\": \"92.50\",\n      \"nivel_riesgo\": \"BAJO\",\n      \"color_riesgo\": \"#22c55e\"\n    },\n    {\n      \"codigo_iso\": \"PE\",\n      \"nombre\": \"Perú\",\n      \"moneda_codigo\": \"PEN\",\n      \"moneda_nombre\": \"Sol peruano\",\n      \"region\": \"ANDINA\",\n      \"region_display\": \"Andina\",\n      \"latitud\": \"-9.190000\",\n      \"longitud\": \"-75.015200\",\n      \"poblacion\": 34352719,\n      \"bandera_url\": \"https://flagcdn.com/w320/pe.png\",\n      \"activo\": true,\n      \"irpc\": \"92.50\",\n      \"nivel_riesgo\": \"BAJO\",\n      \"color_riesgo\": \"#22c55e\"\n    }\n  ]\n}"
+            }
+          ]
+        },
+        {
+          "name": "Buscar países",
+          "request": {
+            "method": "GET",
+            "header": [],
+            "url": {
+              "raw": "{{baseUrl}}/paises/?search=col",
+              "host": [
+                "{{baseUrl}}"
+              ],
+              "path": [
+                "paises",
+                ""
+              ],
+              "query": [
+                {
+                  "key": "search",
+                  "value": "col"
+                }
+              ]
+            },
+            "description": ""
+          },
+          "response": [
+            {
+              "name": "Respuesta (200)",
+              "originalRequest": {
+                "method": "GET",
+                "header": [],
+                "url": {
+                  "raw": "{{baseUrl}}/paises/?search=col",
+                  "host": [
+                    "{{baseUrl}}"
+                  ],
+                  "path": [
+                    "paises",
+                    ""
+                  ],
+                  "query": [
+                    {
+                      "key": "search",
+                      "value": "col"
+                    }
+                  ]
+                }
+              },
+              "status": "OK",
+              "code": 200,
+              "_postman_previewlanguage": "json",
+              "header": [
+                {
+                  "key": "Content-Type",
+                  "value": "application/json"
+                }
+              ],
+              "body": "{\n  \"count\": 1,\n  \"next\": null,\n  \"previous\": null,\n  \"results\": [\n    {\n      \"codigo_iso\": \"CO\",\n      \"nombre\": \"Colombia\",\n      \"moneda_codigo\": \"COP\",\n      \"moneda_nombre\": \"Peso colombiano\",\n      \"region\": \"ANDINA\",\n      \"region_display\": \"Andina\",\n      \"latitud\": \"4.570900\",\n      \"longitud\": \"-74.297300\",\n      \"poblacion\": 52085168,\n      \"bandera_url\": \"https://flagcdn.com/w320/co.png\",\n      \"activo\": true,\n      \"irpc\": \"75.00\",\n      \"nivel_riesgo\": \"BAJO\",\n      \"color_riesgo\": \"#22c55e\"\n    }\n  ]\n}"
+            }
+          ]
+        },
+        {
+          "name": "Detalle de país",
+          "request": {
+            "method": "GET",
+            "header": [],
+            "url": {
+              "raw": "{{baseUrl}}/paises/CO/",
+              "host": [
+                "{{baseUrl}}"
+              ],
+              "path": [
+                "paises",
+                "CO",
+                ""
+              ]
+            },
+            "description": ""
+          },
+          "response": [
+            {
+              "name": "Respuesta (200)",
+              "originalRequest": {
+                "method": "GET",
+                "header": [],
+                "url": {
+                  "raw": "{{baseUrl}}/paises/CO/",
+                  "host": [
+                    "{{baseUrl}}"
+                  ],
+                  "path": [
+                    "paises",
+                    "CO",
+                    ""
+                  ]
+                }
+              },
+              "status": "OK",
+              "code": 200,
+              "_postman_previewlanguage": "json",
+              "header": [
+                {
+                  "key": "Content-Type",
+                  "value": "application/json"
+                }
+              ],
+              "body": "{\n  \"codigo_iso\": \"CO\",\n  \"nombre\": \"Colombia\",\n  \"moneda_codigo\": \"COP\",\n  \"moneda_nombre\": \"Peso colombiano\",\n  \"region\": \"ANDINA\",\n  \"region_display\": \"Andina\",\n  \"latitud\": \"4.570900\",\n  \"longitud\": \"-74.297300\",\n  \"poblacion\": 52085168,\n  \"bandera_url\": \"https://flagcdn.com/w320/co.png\",\n  \"activo\": true,\n  \"irpc\": \"75.00\",\n  \"nivel_riesgo\": \"BAJO\",\n  \"color_riesgo\": \"#22c55e\",\n  \"indicadores_actuales\": [\n    {\n      \"id\": 15,\n      \"pais\": \"CO\",\n      \"tipo\": \"BALANZA_COMERCIAL\",\n      \"tipo_display\": \"Balanza comercial\",\n      \"valor\": \"-4.2000\",\n      \"unidad\": \"PORCENTAJE\",\n      \"anio\": 2023,\n      \"fuente\": \"MANUAL\",\n      \"fecha_actualizacion\": \"2026-11-18T20:14:31.731520-05:00\"\n    },\n    {\n      \"id\": 12,\n      \"pais\": \"CO\",\n      \"tipo\": \"DESEMPLEO\",\n      \"tipo_display\": \"Desempleo\",\n      \"valor\": \"11.3000\",\n      \"unidad\": \"PORCENTAJE\",\n      \"anio\": 2023,\n      \"fuente\": \"MANUAL\",\n      \"fecha_actualizacion\": \"2026-11-18T20:14:31.729957-05:00\"\n    },\n    {\n      \"id\": 18,\n      \"pais\": \"CO\",\n      \"tipo\": \"DEUDA_PIB\",\n      \"tipo_display\": \"Deuda / PIB\",\n      \"valor\": \"55.0000\",\n      \"unidad\": \"PORCENTAJE\",\n      \"anio\": 2023,\n      \"fuente\": \"MANUAL\",\n      \"fecha_actualizacion\": \"2026-11-18T20:14:31.733101-05:00\"\n    }\n  ],\n  \"tipo_cambio_actual\": {\n    \"id\": 30,\n    \"moneda_origen\": \"COP\",\n    \"moneda_destino\": \"USD\",\n    \"tasa\": \"4050.000000\",\n    \"fecha\": \"2026-11-18\",\n    \"variacion_porcentual\": \"-0.6767\",\n    \"fuente\": \"SEED\"\n  }\n}"
+            }
+          ]
+        },
+        {
+          "name": "Indicadores de un país",
+          "request": {
+            "method": "GET",
+            "header": [],
+            "url": {
+              "raw": "{{baseUrl}}/paises/CO/indicadores/?tipo=INFLACION",
+              "host": [
+                "{{baseUrl}}"
+              ],
+              "path": [
+                "paises",
+                "CO",
+                "indicadores",
+                ""
+              ],
+              "query": [
+                {
+                  "key": "tipo",
+                  "value": "INFLACION"
+                }
+              ]
+            },
+            "description": ""
+          },
+          "response": [
+            {
+              "name": "Respuesta (200)",
+              "originalRequest": {
+                "method": "GET",
+                "header": [],
+                "url": {
+                  "raw": "{{baseUrl}}/paises/CO/indicadores/?tipo=INFLACION",
+                  "host": [
+                    "{{baseUrl}}"
+                  ],
+                  "path": [
+                    "paises",
+                    "CO",
+                    "indicadores",
+                    ""
+                  ],
+                  "query": [
+                    {
+                      "key": "tipo",
+                      "value": "INFLACION"
+                    }
+                  ]
+                }
+              },
+              "status": "OK",
+              "code": 200,
+              "_postman_previewlanguage": "json",
+              "header": [
+                {
+                  "key": "Content-Type",
+                  "value": "application/json"
+                }
+              ],
+              "body": "{\n  \"count\": 3,\n  \"next\": null,\n  \"previous\": null,\n  \"results\": [\n    {\n      \"id\": 9,\n      \"pais\": \"CO\",\n      \"tipo\": \"INFLACION\",\n      \"tipo_display\": \"Inflación\",\n      \"valor\": \"9.2000\",\n      \"unidad\": \"PORCENTAJE\",\n      \"anio\": 2023,\n      \"fuente\": \"MANUAL\",\n      \"fecha_actualizacion\": \"2026-11-18T20:14:31.728385-05:00\"\n    },\n    {\n      \"id\": 8,\n      \"pais\": \"CO\",\n      \"tipo\": \"INFLACION\",\n      \"tipo_display\": \"Inflación\",\n      \"valor\": \"10.2000\",\n      \"unidad\": \"PORCENTAJE\",\n      \"anio\": 2022,\n      \"fuente\": \"MANUAL\",\n      \"fecha_actualizacion\": \"2026-11-18T20:14:31.727837-05:00\"\n    },\n    {\n      \"id\": 7,\n      \"pais\": \"CO\",\n      \"tipo\": \"INFLACION\",\n      \"tipo_display\": \"Inflación\",\n      \"valor\": \"3.5000\",\n      \"unidad\": \"PORCENTAJE\",\n      \"anio\": 2021,\n      \"fuente\": \"MANUAL\",\n      \"fecha_actualizacion\": \"2026-11-18T20:14:31.727304-05:00\"\n    }\n  ]\n}"
+            }
+          ]
+        },
+        {
+          "name": "Histórico tipo de cambio",
+          "request": {
+            "method": "GET",
+            "header": [],
+            "url": {
+              "raw": "{{baseUrl}}/paises/CO/tipo-cambio/?page_size=30",
+              "host": [
+                "{{baseUrl}}"
+              ],
+              "path": [
+                "paises",
+                "CO",
+                "tipo-cambio",
+                ""
+              ],
+              "query": [
+                {
+                  "key": "page_size",
+                  "value": "30"
+                }
+              ]
+            },
+            "description": ""
+          },
+          "response": [
+            {
+              "name": "Respuesta (200)",
+              "originalRequest": {
+                "method": "GET",
+                "header": [],
+                "url": {
+                  "raw": "{{baseUrl}}/paises/CO/tipo-cambio/?page_size=30",
+                  "host": [
+                    "{{baseUrl}}"
+                  ],
+                  "path": [
+                    "paises",
+                    "CO",
+                    "tipo-cambio",
+                    ""
+                  ],
+                  "query": [
+                    {
+                      "key": "page_size",
+                      "value": "30"
+                    }
+                  ]
+                }
+              },
+              "status": "OK",
+              "code": 200,
+              "_postman_previewlanguage": "json",
+              "header": [
+                {
+                  "key": "Content-Type",
+                  "value": "application/json"
+                }
+              ],
+              "body": "{\n  \"count\": 30,\n  \"next\": null,\n  \"previous\": null,\n  \"results\": [\n    {\n      \"id\": 30,\n      \"moneda_origen\": \"COP\",\n      \"moneda_destino\": \"USD\",\n      \"tasa\": \"4050.000000\",\n      \"fecha\": \"2026-11-18\",\n      \"variacion_porcentual\": \"-0.6767\",\n      \"fuente\": \"SEED\"\n    },\n    {\n      \"id\": 29,\n      \"moneda_origen\": \"COP\",\n      \"moneda_destino\": \"USD\",\n      \"tasa\": \"4077.591733\",\n      \"fecha\": \"2026-11-17\",\n      \"variacion_porcentual\": \"0.1084\",\n      \"fuente\": \"SEED\"\n    },\n    {\n      \"id\": 28,\n      \"moneda_origen\": \"COP\",\n      \"moneda_destino\": \"USD\",\n      \"tasa\": \"4073.175253\",\n      \"fecha\": \"2026-11-16\",\n      \"variacion_porcentual\": \"-1.7401\",\n      \"fuente\": \"SEED\"\n    }\n  ]\n}"
+            }
+          ]
+        },
+        {
+          "name": "Sincronizar indicadores (ADMIN)",
+          "request": {
+            "method": "POST",
+            "header": [],
+            "url": {
+              "raw": "{{baseUrl}}/paises/sync-indicadores/",
+              "host": [
+                "{{baseUrl}}"
+              ],
+              "path": [
+                "paises",
+                "sync-indicadores",
+                ""
+              ]
+            },
+            "description": "Consulta World Bank, ExchangeRate-API y recalcula IRPC. Escenario 1: si las APIs externas no responden la sincronización no falla; devuelve el detalle de errores.",
+            "auth": {
+              "type": "bearer",
+              "bearer": [
+                {
+                  "key": "token",
+                  "value": "{{admin_token}}",
+                  "type": "string"
+                }
+              ]
+            }
+          },
+          "response": [
+            {
+              "name": "APIs externas caídas: continúa y reporta errores (200)",
+              "originalRequest": {
+                "method": "POST",
+                "header": [],
+                "url": {
+                  "raw": "{{baseUrl}}/paises/sync-indicadores/",
+                  "host": [
+                    "{{baseUrl}}"
+                  ],
+                  "path": [
+                    "paises",
+                    "sync-indicadores",
+                    ""
+                  ]
+                },
+                "auth": {
+                  "type": "bearer",
+                  "bearer": [
+                    {
+                      "key": "token",
+                      "value": "{{admin_token}}",
+                      "type": "string"
+                    }
+                  ]
+                }
+              },
+              "status": "OK",
+              "code": 200,
+              "_postman_previewlanguage": "json",
+              "header": [
+                {
+                  "key": "Content-Type",
+                  "value": "application/json"
+                }
+              ],
+              "body": "{\n  \"indicadores\": {\n    \"procesados\": 10,\n    \"actualizados\": 0,\n    \"errores\": [\n      {\n        \"contexto\": \"AR/PIB\",\n        \"mensaje\": \"No se pudo obtener el indicador.\"\n      },\n      {\n        \"contexto\": \"AR/INFLACION\",\n        \"mensaje\": \"No se pudo obtener el indicador.\"\n      },\n      {\n        \"contexto\": \"AR/DESEMPLEO\",\n        \"mensaje\": \"No se pudo obtener el indicador.\"\n      }\n    ]\n  },\n  \"tipos_cambio\": {\n    \"procesados\": 0,\n    \"actualizados\": 0,\n    \"errores\": [\n      {\n        \"contexto\": \"EXCHANGE_RATE_API\",\n        \"mensaje\": \"No se pudieron obtener las tasas de cambio.\"\n      }\n    ]\n  },\n  \"irpc\": {\n    \"calculados\": 10,\n    \"errores\": []\n  }\n}"
+            }
+          ]
+        },
+        {
+          "name": "Sincronizar como ANALISTA → 403",
+          "request": {
+            "method": "POST",
+            "header": [],
+            "url": {
+              "raw": "{{baseUrl}}/paises/sync-indicadores/",
+              "host": [
+                "{{baseUrl}}"
+              ],
+              "path": [
+                "paises",
+                "sync-indicadores",
+                ""
+              ]
+            },
+            "description": ""
+          },
+          "response": [
+            {
+              "name": "Permisos insuficientes (403)",
+              "originalRequest": {
+                "method": "POST",
+                "header": [],
+                "url": {
+                  "raw": "{{baseUrl}}/paises/sync-indicadores/",
+                  "host": [
+                    "{{baseUrl}}"
+                  ],
+                  "path": [
+                    "paises",
+                    "sync-indicadores",
+                    ""
+                  ]
+                }
+              },
+              "status": "Forbidden",
+              "code": 403,
+              "_postman_previewlanguage": "json",
+              "header": [
+                {
+                  "key": "Content-Type",
+                  "value": "application/json"
+                }
+              ],
+              "body": "{\n  \"error\": true,\n  \"codigo\": 403,\n  \"mensaje\": \"Esta acción requiere rol ADMIN.\",\n  \"detalles\": null\n}"
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "name": "Índice de riesgo (IRPC)",
+      "description": "Ranking, detalle, histórico y recálculo.",
+      "item": [
+        {
+          "name": "Ranking IRPC",
+          "request": {
+            "method": "GET",
+            "header": [],
+            "url": {
+              "raw": "{{baseUrl}}/riesgo/",
+              "host": [
+                "{{baseUrl}}"
+              ],
+              "path": [
+                "riesgo",
+                ""
+              ]
+            },
+            "description": ""
+          },
+          "response": [
+            {
+              "name": "Respuesta (200)",
+              "originalRequest": {
+                "method": "GET",
+                "header": [],
+                "url": {
+                  "raw": "{{baseUrl}}/riesgo/",
+                  "host": [
+                    "{{baseUrl}}"
+                  ],
+                  "path": [
+                    "riesgo",
+                    ""
+                  ]
+                }
+              },
+              "status": "OK",
+              "code": 200,
+              "_postman_previewlanguage": "json",
+              "header": [
+                {
+                  "key": "Content-Type",
+                  "value": "application/json"
+                }
+              ],
+              "body": "{\n  \"count\": 10,\n  \"next\": null,\n  \"previous\": null,\n  \"results\": [\n    {\n      \"posicion\": 1,\n      \"id\": 18,\n      \"pais\": \"PY\",\n      \"pais_nombre\": \"Paraguay\",\n      \"fecha_calculo\": \"2026-11-18T20:14:33.407352-05:00\",\n      \"score_economico\": \"95.00\",\n      \"score_cambiario\": \"100.00\",\n      \"score_estabilidad\": \"100.00\",\n      \"indice_compuesto\": \"98.00\",\n      \"nivel_riesgo\": \"BAJO\",\n      \"color\": \"#22c55e\",\n      \"accion_recomendada\": \"Favorable para inversión\",\n      \"bandera_url\": \"https://flagcdn.com/w320/py.png\",\n      \"region\": \"CONO_SUR\",\n      \"variacion\": 0.0,\n      \"tendencia\": \"ESTABLE\"\n    },\n    {\n      \"posicion\": 2,\n      \"id\": 16,\n      \"pais\": \"MX\",\n      \"pais_nombre\": \"México\",\n      \"fecha_calculo\": \"2026-11-18T20:14:33.403377-05:00\",\n      \"score_economico\": \"90.00\",\n      \"score_cambiario\": \"100.00\",\n      \"score_estabilidad\": \"90.00\",\n      \"indice_compuesto\": \"93.00\",\n      \"nivel_riesgo\": \"BAJO\",\n      \"color\": \"#22c55e\",\n      \"accion_recomendada\": \"Favorable para inversión\",\n      \"bandera_url\": \"https://flagcdn.com/w320/mx.png\",\n      \"region\": \"CENTROAMERICA\",\n      \"variacion\": 0.0,\n      \"tendencia\": \"ESTABLE\"\n    },\n    {\n      \"posicion\": 3,\n      \"id\": 15,\n      \"pais\": \"EC\",\n      \"pais_nombre\": \"Ecuador\",\n      \"fecha_calculo\": \"2026-11-18T20:14:33.401359-05:00\",\n      \"score_economico\": \"85.00\",\n      \"score_cambiario\": \"100.00\",\n      \"score_estabilidad\": \"95.00\",\n      \"indice_compuesto\": \"92.50\",\n      \"nivel_riesgo\": \"BAJO\",\n      \"color\": \"#22c55e\",\n      \"accion_recomendada\": \"Favorable para inversión\",\n      \"bandera_url\": \"https://flagcdn.com/w320/ec.png\",\n      \"region\": \"ANDINA\",\n      \"variacion\": 0.0,\n      \"tendencia\": \"ESTABLE\"\n    }\n  ]\n}"
+            }
+          ]
+        },
+        {
+          "name": "Detalle de riesgo con histórico",
+          "request": {
+            "method": "GET",
+            "header": [],
+            "url": {
+              "raw": "{{baseUrl}}/riesgo/CO/",
+              "host": [
+                "{{baseUrl}}"
+              ],
+              "path": [
+                "riesgo",
+                "CO",
+                ""
+              ]
+            },
+            "description": ""
+          },
+          "response": [
+            {
+              "name": "Respuesta (200)",
+              "originalRequest": {
+                "method": "GET",
+                "header": [],
+                "url": {
+                  "raw": "{{baseUrl}}/riesgo/CO/",
+                  "host": [
+                    "{{baseUrl}}"
+                  ],
+                  "path": [
+                    "riesgo",
+                    "CO",
+                    ""
+                  ]
+                }
+              },
+              "status": "OK",
+              "code": 200,
+              "_postman_previewlanguage": "json",
+              "header": [
+                {
+                  "key": "Content-Type",
+                  "value": "application/json"
+                }
+              ],
+              "body": "{\n  \"id\": 14,\n  \"pais\": \"CO\",\n  \"pais_nombre\": \"Colombia\",\n  \"fecha_calculo\": \"2026-11-18T20:14:33.399418-05:00\",\n  \"score_economico\": \"60.00\",\n  \"score_cambiario\": \"90.00\",\n  \"score_estabilidad\": \"80.00\",\n  \"indice_compuesto\": \"75.00\",\n  \"nivel_riesgo\": \"BAJO\",\n  \"color\": \"#22c55e\",\n  \"accion_recomendada\": \"Favorable para inversión\",\n  \"detalle_calculo\": {\n    \"entradas\": {\n      \"PIB_PERCAPITA\": 6800.0,\n      \"INFLACION\": 9.2,\n      \"DESEMPLEO\": 11.3,\n      \"DEUDA_PIB\": 55.0,\n      \"BALANZA_COMERCIAL\": -4.2,\n      \"CRECIMIENTO_PIB\": 1.508,\n      \"VOLATILIDAD\": 0.7249,\n      \"DEPRECIACION\": -3.862\n    },\n    \"penalizaciones\": {\n      \"PIB_PERCAPITA\": 5,\n      \"INFLACION\": 10,\n      \"DESEMPLEO\": 15,\n      \"DEUDA_PIB\": 10,\n      \"VOLATILIDAD\": 10,\n      \"DEPRECIACION\": 0,\n      \"BALANZA_COMERCIAL\": 5,\n      \"CRECIMIENTO_PIB\": 0,\n      \"INDICADORES_NEGATIVOS\": 15\n    },\n    \"indicadores_negativos\": 3,\n    \"indicadores_faltantes\": [],\n    \"datos_completos\": true,\n    \"periodo\": {\n      \"indicadores\": {\n        \"PIB_PERCAPITA\": 2023,\n        \"INFLACION\": 2023,\n        \"DESEMPLEO\": 2023,\n        \"DEUDA_PIB\": 2023,\n        \"BALANZA_COMERCIAL\": 2023,\n        \"CRECIMIENTO_PIB\": \"2022-2023\"\n      },\n      \"tipo_cambio\": {\n        \"desde\": \"2026-10-20\",\n        \"hasta\": \"2026-11-18\",\n        \"observaciones\": 30\n      }\n    },\n    \"pesos\": {\n      \"score_economico\": 0.4,\n      \"score_cambiario\": 0.3,\n      \"score_estabilidad\": 0.3\n    },\n    \"color\": \"#22c55e\",\n    \"accion_recomendada\": \"Favorable para inversión\"\n  },\n  \"historico\": [\n    {\n      \"id\": 14,\n      \"pais\": \"CO\",\n      \"pais_nombre\": \"Colombia\",\n      \"fecha_calculo\": \"2026-11-18T20:14:33.399418-05:00\",\n      \"score_economico\": \"60.00\",\n      \"score_cambiario\": \"90.00\",\n      \"score_estabilidad\": \"80.00\",\n      \"indice_compuesto\": \"75.00\",\n      \"nivel_riesgo\": \"BAJO\",\n      \"color\": \"#22c55e\",\n      \"accion_recomendada\": \"Favorable para inversión\"\n    },\n    {\n      \"id\": 1,\n      \"pais\": \"CO\",\n      \"pais_nombre\": \"Colombia\",\n      \"fecha_calculo\": \"2026-11-18T20:14:31.977378-05:00\",\n      \"score_economico\": \"60.00\",\n      \"score_cambiario\": \"90.00\",\n      \"score_estabilidad\": \"80.00\",\n      \"indice_compuesto\": \"75.00\",\n      \"nivel_riesgo\": \"BAJO\",\n      \"color\": \"#22c55e\",\n      \"accion_recomendada\": \"Favorable para inversión\"\n    }\n  ]\n}"
+            }
+          ]
+        },
+        {
+          "name": "Histórico IRPC",
+          "request": {
+            "method": "GET",
+            "header": [],
+            "url": {
+              "raw": "{{baseUrl}}/riesgo/CO/historico/?fecha_desde=2026-01-01",
+              "host": [
+                "{{baseUrl}}"
+              ],
+              "path": [
+                "riesgo",
+                "CO",
+                "historico",
+                ""
+              ],
+              "query": [
+                {
+                  "key": "fecha_desde",
+                  "value": "2026-01-01"
+                }
+              ]
+            },
+            "description": ""
+          },
+          "response": [
+            {
+              "name": "Respuesta (200)",
+              "originalRequest": {
+                "method": "GET",
+                "header": [],
+                "url": {
+                  "raw": "{{baseUrl}}/riesgo/CO/historico/?fecha_desde=2026-01-01",
+                  "host": [
+                    "{{baseUrl}}"
+                  ],
+                  "path": [
+                    "riesgo",
+                    "CO",
+                    "historico",
+                    ""
+                  ],
+                  "query": [
+                    {
+                      "key": "fecha_desde",
+                      "value": "2026-01-01"
+                    }
+                  ]
+                }
+              },
+              "status": "OK",
+              "code": 200,
+              "_postman_previewlanguage": "json",
+              "header": [
+                {
+                  "key": "Content-Type",
+                  "value": "application/json"
+                }
+              ],
+              "body": "{\n  \"count\": 2,\n  \"next\": null,\n  \"previous\": null,\n  \"results\": [\n    {\n      \"id\": 14,\n      \"pais\": \"CO\",\n      \"pais_nombre\": \"Colombia\",\n      \"fecha_calculo\": \"2026-11-18T20:14:33.399418-05:00\",\n      \"score_economico\": \"60.00\",\n      \"score_cambiario\": \"90.00\",\n      \"score_estabilidad\": \"80.00\",\n      \"indice_compuesto\": \"75.00\",\n      \"nivel_riesgo\": \"BAJO\",\n      \"color\": \"#22c55e\",\n      \"accion_recomendada\": \"Favorable para inversión\"\n    },\n    {\n      \"id\": 1,\n      \"pais\": \"CO\",\n      \"pais_nombre\": \"Colombia\",\n      \"fecha_calculo\": \"2026-11-18T20:14:31.977378-05:00\",\n      \"score_economico\": \"60.00\",\n      \"score_cambiario\": \"90.00\",\n      \"score_estabilidad\": \"80.00\",\n      \"indice_compuesto\": \"75.00\",\n      \"nivel_riesgo\": \"BAJO\",\n      \"color\": \"#22c55e\",\n      \"accion_recomendada\": \"Favorable para inversión\"\n    }\n  ]\n}"
+            }
+          ]
+        },
+        {
+          "name": "Recalcular IRPC (ADMIN)",
+          "request": {
+            "method": "POST",
+            "header": [],
+            "url": {
+              "raw": "{{baseUrl}}/riesgo/calcular/",
+              "host": [
+                "{{baseUrl}}"
+              ],
+              "path": [
+                "riesgo",
+                "calcular",
+                ""
+              ]
+            },
+            "description": "",
+            "auth": {
+              "type": "bearer",
+              "bearer": [
+                {
+                  "key": "token",
+                  "value": "{{admin_token}}",
+                  "type": "string"
+                }
+              ]
+            }
+          },
+          "response": [
+            {
+              "name": "Respuesta (200)",
+              "originalRequest": {
+                "method": "POST",
+                "header": [],
+                "url": {
+                  "raw": "{{baseUrl}}/riesgo/calcular/",
+                  "host": [
+                    "{{baseUrl}}"
+                  ],
+                  "path": [
+                    "riesgo",
+                    "calcular",
+                    ""
+                  ]
+                },
+                "auth": {
+                  "type": "bearer",
+                  "bearer": [
+                    {
+                      "key": "token",
+                      "value": "{{admin_token}}",
+                      "type": "string"
+                    }
+                  ]
+                }
+              },
+              "status": "OK",
+              "code": 200,
+              "_postman_previewlanguage": "json",
+              "header": [
+                {
+                  "key": "Content-Type",
+                  "value": "application/json"
+                }
+              ],
+              "body": "{\n  \"calculados\": 10,\n  \"errores\": [],\n  \"ranking\": [\n    {\n      \"posicion\": null,\n      \"id\": 28,\n      \"pais\": \"PY\",\n      \"pais_nombre\": \"Paraguay\",\n      \"fecha_calculo\": \"2026-11-18T20:14:33.446513-05:00\",\n      \"score_economico\": \"95.00\",\n      \"score_cambiario\": \"100.00\",\n      \"score_estabilidad\": \"100.00\",\n      \"indice_compuesto\": \"98.00\",\n      \"nivel_riesgo\": \"BAJO\",\n      \"color\": \"#22c55e\",\n      \"accion_recomendada\": \"Favorable para inversión\",\n      \"bandera_url\": \"https://flagcdn.com/w320/py.png\",\n      \"region\": \"CONO_SUR\",\n      \"variacion\": 0.0,\n      \"tendencia\": \"ESTABLE\"\n    },\n    {\n      \"posicion\": null,\n      \"id\": 26,\n      \"pais\": \"MX\",\n      \"pais_nombre\": \"México\",\n      \"fecha_calculo\": \"2026-11-18T20:14:33.442510-05:00\",\n      \"score_economico\": \"90.00\",\n      \"score_cambiario\": \"100.00\",\n      \"score_estabilidad\": \"90.00\",\n      \"indice_compuesto\": \"93.00\",\n      \"nivel_riesgo\": \"BAJO\",\n      \"color\": \"#22c55e\",\n      \"accion_recomendada\": \"Favorable para inversión\",\n      \"bandera_url\": \"https://flagcdn.com/w320/mx.png\",\n      \"region\": \"CENTROAMERICA\",\n      \"variacion\": 0.0,\n      \"tendencia\": \"ESTABLE\"\n    },\n    {\n      \"posicion\": null,\n      \"id\": 25,\n      \"pais\": \"EC\",\n      \"pais_nombre\": \"Ecuador\",\n      \"fecha_calculo\": \"2026-11-18T20:14:33.440493-05:00\",\n      \"score_economico\": \"85.00\",\n      \"score_cambiario\": \"100.00\",\n      \"score_estabilidad\": \"95.00\",\n      \"indice_compuesto\": \"92.50\",\n      \"nivel_riesgo\": \"BAJO\",\n      \"color\": \"#22c55e\",\n      \"accion_recomendada\": \"Favorable para inversión\",\n      \"bandera_url\": \"https://flagcdn.com/w320/ec.png\",\n      \"region\": \"ANDINA\",\n      \"variacion\": 0.0,\n      \"tendencia\": \"ESTABLE\"\n    }\n  ]\n}"
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "name": "Portafolios",
+      "description": "CRUD, posiciones, validaciones cruzadas, bloqueo optimista y exportación.",
+      "item": [
+        {
+          "name": "Listar portafolios (propios + públicos)",
+          "request": {
+            "method": "GET",
+            "header": [],
+            "url": {
+              "raw": "{{baseUrl}}/portafolios/?ordering=-fecha_modificacion",
+              "host": [
+                "{{baseUrl}}"
+              ],
+              "path": [
+                "portafolios",
+                ""
+              ],
+              "query": [
+                {
+                  "key": "ordering",
+                  "value": "-fecha_modificacion"
+                }
+              ]
+            },
+            "description": ""
+          },
+          "response": [
+            {
+              "name": "Respuesta (200)",
+              "originalRequest": {
+                "method": "GET",
+                "header": [],
+                "url": {
+                  "raw": "{{baseUrl}}/portafolios/?ordering=-fecha_modificacion",
+                  "host": [
+                    "{{baseUrl}}"
+                  ],
+                  "path": [
+                    "portafolios",
+                    ""
+                  ],
+                  "query": [
+                    {
+                      "key": "ordering",
+                      "value": "-fecha_modificacion"
+                    }
+                  ]
+                }
+              },
+              "status": "OK",
+              "code": 200,
+              "_postman_previewlanguage": "json",
+              "header": [
+                {
+                  "key": "Content-Type",
+                  "value": "application/json"
+                }
+              ],
+              "body": "{\n  \"count\": 2,\n  \"next\": null,\n  \"previous\": null,\n  \"results\": [\n    {\n      \"id\": 2,\n      \"nombre\": \"Crecimiento Cono Sur\",\n      \"descripcion\": \"Estrategia de renta variable y monedas en mercados del Cono Sur y México.\",\n      \"es_publico\": false,\n      \"activo\": true,\n      \"usuario\": 2,\n      \"usuario_nombre\": \"Analista DataPulse\",\n      \"es_propio\": true,\n      \"monto_total_activo\": 6200000.0,\n      \"posiciones_activas\": 3,\n      \"fecha_creacion\": \"2026-11-18T20:14:31.973136-05:00\",\n      \"fecha_modificacion\": \"2026-11-18T20:14:31.973147-05:00\"\n    },\n    {\n      \"id\": 1,\n      \"nombre\": \"Andino Conservador\",\n      \"descripcion\": \"Portafolio de renta fija concentrado en la región andina.\",\n      \"es_publico\": true,\n      \"activo\": true,\n      \"usuario\": 2,\n      \"usuario_nombre\": \"Analista DataPulse\",\n      \"es_propio\": true,\n      \"monto_total_activo\": 5750000.0,\n      \"posiciones_activas\": 4,\n      \"fecha_creacion\": \"2026-11-18T20:14:31.969969-05:00\",\n      \"fecha_modificacion\": \"2026-11-18T20:14:31.969980-05:00\"\n    }\n  ]\n}"
+            }
+          ]
+        },
+        {
+          "name": "Crear portafolio",
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "url": {
+              "raw": "{{baseUrl}}/portafolios/",
+              "host": [
+                "{{baseUrl}}"
+              ],
+              "path": [
+                "portafolios",
+                ""
+              ]
+            },
+            "description": "",
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"nombre\": \"Andino Renta Fija\",\n  \"descripcion\": \"Bonos soberanos de la región andina.\",\n  \"es_publico\": true\n}",
+              "options": {
+                "raw": {
+                  "language": "json"
+                }
+              }
+            }
+          },
+          "response": [
+            {
+              "name": "Respuesta (201)",
+              "originalRequest": {
+                "method": "POST",
+                "header": [
+                  {
+                    "key": "Content-Type",
+                    "value": "application/json"
+                  }
+                ],
+                "url": {
+                  "raw": "{{baseUrl}}/portafolios/",
+                  "host": [
+                    "{{baseUrl}}"
+                  ],
+                  "path": [
+                    "portafolios",
+                    ""
+                  ]
+                },
+                "body": {
+                  "mode": "raw",
+                  "raw": "{\n  \"nombre\": \"Andino Renta Fija\",\n  \"descripcion\": \"Bonos soberanos de la región andina.\",\n  \"es_publico\": true\n}",
+                  "options": {
+                    "raw": {
+                      "language": "json"
+                    }
+                  }
+                }
+              },
+              "status": "Created",
+              "code": 201,
+              "_postman_previewlanguage": "json",
+              "header": [
+                {
+                  "key": "Content-Type",
+                  "value": "application/json"
+                }
+              ],
+              "body": "{\n  \"id\": 3,\n  \"nombre\": \"Andino Renta Fija\",\n  \"descripcion\": \"Bonos soberanos de la región andina.\",\n  \"es_publico\": true,\n  \"activo\": true,\n  \"usuario\": 2,\n  \"usuario_nombre\": \"Analista DataPulse\",\n  \"es_propio\": true,\n  \"monto_total_activo\": 0.0,\n  \"posiciones_activas\": 0,\n  \"fecha_creacion\": \"2026-11-18T20:14:33.459727-05:00\",\n  \"fecha_modificacion\": \"2026-11-18T20:14:33.459737-05:00\"\n}"
+            }
+          ],
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "pm.collectionVariables.set(\"portafolio_id\", pm.response.json().id);"
+                ]
+              }
+            }
+          ]
+        },
+        {
+          "name": "Crear con nombre duplicado → 400",
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "url": {
+              "raw": "{{baseUrl}}/portafolios/",
+              "host": [
+                "{{baseUrl}}"
+              ],
+              "path": [
+                "portafolios",
+                ""
+              ]
+            },
+            "description": "",
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"nombre\": \"Andino Renta Fija\",\n  \"descripcion\": \"\",\n  \"es_publico\": false\n}",
+              "options": {
+                "raw": {
+                  "language": "json"
+                }
+              }
+            }
+          },
+          "response": [
+            {
+              "name": "Validación (400)",
+              "originalRequest": {
+                "method": "POST",
+                "header": [
+                  {
+                    "key": "Content-Type",
+                    "value": "application/json"
+                  }
+                ],
+                "url": {
+                  "raw": "{{baseUrl}}/portafolios/",
+                  "host": [
+                    "{{baseUrl}}"
+                  ],
+                  "path": [
+                    "portafolios",
+                    ""
+                  ]
+                },
+                "body": {
+                  "mode": "raw",
+                  "raw": "{\n  \"nombre\": \"Andino Renta Fija\",\n  \"descripcion\": \"\",\n  \"es_publico\": false\n}",
+                  "options": {
+                    "raw": {
+                      "language": "json"
+                    }
+                  }
+                }
+              },
+              "status": "Bad Request",
+              "code": 400,
+              "_postman_previewlanguage": "json",
+              "header": [
+                {
+                  "key": "Content-Type",
+                  "value": "application/json"
+                }
+              ],
+              "body": "{\n  \"error\": true,\n  \"codigo\": 400,\n  \"mensaje\": \"La solicitud contiene datos inválidos.\",\n  \"detalles\": {\n    \"nombre\": [\n      \"Ya tienes un portafolio con este nombre.\"\n    ]\n  }\n}"
+            }
+          ]
+        },
+        {
+          "name": "Verificar nombre disponible",
+          "request": {
+            "method": "GET",
+            "header": [],
+            "url": {
+              "raw": "{{baseUrl}}/portafolios/verificar-nombre/?nombre=Andino Renta Fija",
+              "host": [
+                "{{baseUrl}}"
+              ],
+              "path": [
+                "portafolios",
+                "verificar-nombre",
+                ""
+              ],
+              "query": [
+                {
+                  "key": "nombre",
+                  "value": "Andino Renta Fija"
+                }
+              ]
+            },
+            "description": "Usado por el validador asíncrono del formulario."
+          },
+          "response": [
+            {
+              "name": "Respuesta (200)",
+              "originalRequest": {
+                "method": "GET",
+                "header": [],
+                "url": {
+                  "raw": "{{baseUrl}}/portafolios/verificar-nombre/?nombre=Andino Renta Fija",
+                  "host": [
+                    "{{baseUrl}}"
+                  ],
+                  "path": [
+                    "portafolios",
+                    "verificar-nombre",
+                    ""
+                  ],
+                  "query": [
+                    {
+                      "key": "nombre",
+                      "value": "Andino Renta Fija"
+                    }
+                  ]
+                }
+              },
+              "status": "OK",
+              "code": 200,
+              "_postman_previewlanguage": "json",
+              "header": [
+                {
+                  "key": "Content-Type",
+                  "value": "application/json"
+                }
+              ],
+              "body": "{\n  \"nombre\": \"Andino Renta Fija\",\n  \"disponible\": false,\n  \"mensaje\": \"Ya tienes un portafolio con este nombre.\"\n}"
+            }
+          ]
+        },
+        {
+          "name": "Agregar posición",
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "url": {
+              "raw": "{{baseUrl}}/portafolios/{{portafolio_id}}/posiciones/",
+              "host": [
+                "{{baseUrl}}"
+              ],
+              "path": [
+                "portafolios",
+                "{{portafolio_id}}",
+                "posiciones",
+                ""
+              ]
+            },
+            "description": "",
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"pais\": \"CO\",\n  \"tipo_activo\": \"RENTA_FIJA\",\n  \"monto_inversion_usd\": \"250000.00\",\n  \"fecha_entrada\": \"2026-10-01\",\n  \"notas\": \"TES 2032\"\n}",
+              "options": {
+                "raw": {
+                  "language": "json"
+                }
+              }
+            }
+          },
+          "response": [
+            {
+              "name": "Respuesta (201)",
+              "originalRequest": {
+                "method": "POST",
+                "header": [
+                  {
+                    "key": "Content-Type",
+                    "value": "application/json"
+                  }
+                ],
+                "url": {
+                  "raw": "{{baseUrl}}/portafolios/{{portafolio_id}}/posiciones/",
+                  "host": [
+                    "{{baseUrl}}"
+                  ],
+                  "path": [
+                    "portafolios",
+                    "{{portafolio_id}}",
+                    "posiciones",
+                    ""
+                  ]
+                },
+                "body": {
+                  "mode": "raw",
+                  "raw": "{\n  \"pais\": \"CO\",\n  \"tipo_activo\": \"RENTA_FIJA\",\n  \"monto_inversion_usd\": \"250000.00\",\n  \"fecha_entrada\": \"2026-10-01\",\n  \"notas\": \"TES 2032\"\n}",
+                  "options": {
+                    "raw": {
+                      "language": "json"
+                    }
+                  }
+                }
+              },
+              "status": "Created",
+              "code": 201,
+              "_postman_previewlanguage": "json",
+              "header": [
+                {
+                  "key": "Content-Type",
+                  "value": "application/json"
+                }
+              ],
+              "body": "{\n  \"id\": 9,\n  \"portafolio\": 3,\n  \"pais\": \"CO\",\n  \"pais_nombre\": \"Colombia\",\n  \"tipo_activo\": \"RENTA_FIJA\",\n  \"tipo_activo_display\": \"Renta fija\",\n  \"fecha_entrada\": \"2026-10-01\",\n  \"monto_inversion_usd\": \"250000.00\",\n  \"fecha_salida\": null,\n  \"notas\": \"TES 2032\",\n  \"esta_activa\": true\n}"
+            }
+          ],
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "pm.collectionVariables.set(\"posicion_id\", pm.response.json().id);"
+                ]
+              }
+            }
+          ]
+        },
+        {
+          "name": "Posición MONEDA en Ecuador → 400",
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "url": {
+              "raw": "{{baseUrl}}/portafolios/{{portafolio_id}}/posiciones/",
+              "host": [
+                "{{baseUrl}}"
+              ],
+              "path": [
+                "portafolios",
+                "{{portafolio_id}}",
+                "posiciones",
+                ""
+              ]
+            },
+            "description": "",
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"pais\": \"EC\",\n  \"tipo_activo\": \"MONEDA\",\n  \"monto_inversion_usd\": \"5000.00\",\n  \"fecha_entrada\": \"2026-10-01\"\n}",
+              "options": {
+                "raw": {
+                  "language": "json"
+                }
+              }
+            }
+          },
+          "response": [
+            {
+              "name": "Validación cruzada (400)",
+              "originalRequest": {
+                "method": "POST",
+                "header": [
+                  {
+                    "key": "Content-Type",
+                    "value": "application/json"
+                  }
+                ],
+                "url": {
+                  "raw": "{{baseUrl}}/portafolios/{{portafolio_id}}/posiciones/",
+                  "host": [
+                    "{{baseUrl}}"
+                  ],
+                  "path": [
+                    "portafolios",
+                    "{{portafolio_id}}",
+                    "posiciones",
+                    ""
+                  ]
+                },
+                "body": {
+                  "mode": "raw",
+                  "raw": "{\n  \"pais\": \"EC\",\n  \"tipo_activo\": \"MONEDA\",\n  \"monto_inversion_usd\": \"5000.00\",\n  \"fecha_entrada\": \"2026-10-01\"\n}",
+                  "options": {
+                    "raw": {
+                      "language": "json"
+                    }
+                  }
+                }
+              },
+              "status": "Bad Request",
+              "code": 400,
+              "_postman_previewlanguage": "json",
+              "header": [
+                {
+                  "key": "Content-Type",
+                  "value": "application/json"
+                }
+              ],
+              "body": "{\n  \"error\": true,\n  \"codigo\": 400,\n  \"mensaje\": \"La solicitud contiene datos inválidos.\",\n  \"detalles\": {\n    \"tipo_activo\": [\n      \"No se permite el tipo de activo MONEDA para Ecuador: su moneda es el dólar estadounidense (USD).\"\n    ]\n  }\n}"
+            }
+          ]
+        },
+        {
+          "name": "Editar posición",
+          "request": {
+            "method": "PUT",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "url": {
+              "raw": "{{baseUrl}}/portafolios/{{portafolio_id}}/posiciones/{{posicion_id}}/",
+              "host": [
+                "{{baseUrl}}"
+              ],
+              "path": [
+                "portafolios",
+                "{{portafolio_id}}",
+                "posiciones",
+                "{{posicion_id}}",
+                ""
+              ]
+            },
+            "description": "",
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"pais\": \"CO\",\n  \"tipo_activo\": \"RENTA_FIJA\",\n  \"monto_inversion_usd\": \"300000.00\",\n  \"fecha_entrada\": \"2026-10-01\",\n  \"notas\": \"TES 2032 (ampliada)\"\n}",
+              "options": {
+                "raw": {
+                  "language": "json"
+                }
+              }
+            }
+          },
+          "response": [
+            {
+              "name": "Respuesta (200)",
+              "originalRequest": {
+                "method": "PUT",
+                "header": [
+                  {
+                    "key": "Content-Type",
+                    "value": "application/json"
+                  }
+                ],
+                "url": {
+                  "raw": "{{baseUrl}}/portafolios/{{portafolio_id}}/posiciones/{{posicion_id}}/",
+                  "host": [
+                    "{{baseUrl}}"
+                  ],
+                  "path": [
+                    "portafolios",
+                    "{{portafolio_id}}",
+                    "posiciones",
+                    "{{posicion_id}}",
+                    ""
+                  ]
+                },
+                "body": {
+                  "mode": "raw",
+                  "raw": "{\n  \"pais\": \"CO\",\n  \"tipo_activo\": \"RENTA_FIJA\",\n  \"monto_inversion_usd\": \"300000.00\",\n  \"fecha_entrada\": \"2026-10-01\",\n  \"notas\": \"TES 2032 (ampliada)\"\n}",
+                  "options": {
+                    "raw": {
+                      "language": "json"
+                    }
+                  }
+                }
+              },
+              "status": "OK",
+              "code": 200,
+              "_postman_previewlanguage": "json",
+              "header": [
+                {
+                  "key": "Content-Type",
+                  "value": "application/json"
+                }
+              ],
+              "body": "{\n  \"id\": 9,\n  \"portafolio\": 3,\n  \"pais\": \"CO\",\n  \"pais_nombre\": \"Colombia\",\n  \"tipo_activo\": \"RENTA_FIJA\",\n  \"tipo_activo_display\": \"Renta fija\",\n  \"fecha_entrada\": \"2026-10-01\",\n  \"monto_inversion_usd\": \"300000.00\",\n  \"fecha_salida\": null,\n  \"notas\": \"TES 2032 (ampliada)\",\n  \"esta_activa\": true\n}"
+            }
+          ]
+        },
+        {
+          "name": "Detalle con posiciones y métricas",
+          "request": {
+            "method": "GET",
+            "header": [],
+            "url": {
+              "raw": "{{baseUrl}}/portafolios/{{portafolio_id}}/",
+              "host": [
+                "{{baseUrl}}"
+              ],
+              "path": [
+                "portafolios",
+                "{{portafolio_id}}",
+                ""
+              ]
+            },
+            "description": ""
+          },
+          "response": [
+            {
+              "name": "Respuesta (200)",
+              "originalRequest": {
+                "method": "GET",
+                "header": [],
+                "url": {
+                  "raw": "{{baseUrl}}/portafolios/{{portafolio_id}}/",
+                  "host": [
+                    "{{baseUrl}}"
+                  ],
+                  "path": [
+                    "portafolios",
+                    "{{portafolio_id}}",
+                    ""
+                  ]
+                }
+              },
+              "status": "OK",
+              "code": 200,
+              "_postman_previewlanguage": "json",
+              "header": [
+                {
+                  "key": "Content-Type",
+                  "value": "application/json"
+                }
+              ],
+              "body": "{\n  \"id\": 3,\n  \"nombre\": \"Andino Renta Fija\",\n  \"descripcion\": \"Bonos soberanos de la región andina.\",\n  \"es_publico\": true,\n  \"activo\": true,\n  \"usuario\": 2,\n  \"usuario_nombre\": \"Analista DataPulse\",\n  \"es_propio\": true,\n  \"monto_total_activo\": 300000.0,\n  \"posiciones_activas\": 1,\n  \"fecha_creacion\": \"2026-11-18T20:14:33.459727-05:00\",\n  \"fecha_modificacion\": \"2026-11-18T20:14:33.478410-05:00\",\n  \"posiciones\": [\n    {\n      \"id\": 9,\n      \"portafolio\": 3,\n      \"pais\": \"CO\",\n      \"pais_nombre\": \"Colombia\",\n      \"tipo_activo\": \"RENTA_FIJA\",\n      \"tipo_activo_display\": \"Renta fija\",\n      \"fecha_entrada\": \"2026-10-01\",\n      \"monto_inversion_usd\": \"300000.00\",\n      \"fecha_salida\": null,\n      \"notas\": \"TES 2032 (ampliada)\",\n      \"esta_activa\": true\n    }\n  ],\n  \"metricas\": {\n    \"monto_total_activo\": 300000.0,\n    \"monto_total_historico\": 300000.0,\n    \"limite_monto_activo\": 50000000.0,\n    \"monto_disponible\": 49700000.0,\n    \"posiciones_activas\": 1,\n    \"posiciones_cerradas\": 0,\n    \"riesgo_promedio_ponderado\": 75.0,\n    \"nivel_riesgo\": \"BAJO\",\n    \"color_riesgo\": \"#22c55e\",\n    \"accion_recomendada\": \"Favorable para inversión\",\n    \"distribucion_pais\": [\n      {\n        \"pais\": \"CO\",\n        \"nombre\": \"Colombia\",\n        \"irpc\": 75.0,\n        \"nivel_riesgo\": \"BAJO\",\n        \"color\": \"#22c55e\",\n        \"monto\": 300000.0,\n        \"porcentaje\": 100.0\n      }\n    ],\n    \"distribucion_tipo_activo\": [\n      {\n        \"tipo_activo\": \"RENTA_FIJA\",\n        \"etiqueta\": \"Renta fija\",\n        \"monto\": 300000.0,\n        \"porcentaje\": 100.0\n      }\n    ]\n  }\n}"
+            }
+          ],
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "pm.collectionVariables.set(\"fecha_modificacion\", pm.response.json().fecha_modificacion);"
+                ]
+              }
+            }
+          ]
+        },
+        {
+          "name": "Resumen (distribución por país, tipo y riesgo)",
+          "request": {
+            "method": "GET",
+            "header": [],
+            "url": {
+              "raw": "{{baseUrl}}/portafolios/{{portafolio_id}}/resumen/",
+              "host": [
+                "{{baseUrl}}"
+              ],
+              "path": [
+                "portafolios",
+                "{{portafolio_id}}",
+                "resumen",
+                ""
+              ]
+            },
+            "description": ""
+          },
+          "response": [
+            {
+              "name": "Respuesta (200)",
+              "originalRequest": {
+                "method": "GET",
+                "header": [],
+                "url": {
+                  "raw": "{{baseUrl}}/portafolios/{{portafolio_id}}/resumen/",
+                  "host": [
+                    "{{baseUrl}}"
+                  ],
+                  "path": [
+                    "portafolios",
+                    "{{portafolio_id}}",
+                    "resumen",
+                    ""
+                  ]
+                }
+              },
+              "status": "OK",
+              "code": 200,
+              "_postman_previewlanguage": "json",
+              "header": [
+                {
+                  "key": "Content-Type",
+                  "value": "application/json"
+                }
+              ],
+              "body": "{\n  \"id\": 3,\n  \"nombre\": \"Andino Renta Fija\",\n  \"monto_total_activo\": 300000.0,\n  \"monto_total_historico\": 300000.0,\n  \"limite_monto_activo\": 50000000.0,\n  \"monto_disponible\": 49700000.0,\n  \"posiciones_activas\": 1,\n  \"posiciones_cerradas\": 0,\n  \"riesgo_promedio_ponderado\": 75.0,\n  \"nivel_riesgo\": \"BAJO\",\n  \"color_riesgo\": \"#22c55e\",\n  \"accion_recomendada\": \"Favorable para inversión\",\n  \"distribucion_pais\": [\n    {\n      \"pais\": \"CO\",\n      \"nombre\": \"Colombia\",\n      \"irpc\": 75.0,\n      \"nivel_riesgo\": \"BAJO\",\n      \"color\": \"#22c55e\",\n      \"monto\": 300000.0,\n      \"porcentaje\": 100.0\n    }\n  ],\n  \"distribucion_tipo_activo\": [\n    {\n      \"tipo_activo\": \"RENTA_FIJA\",\n      \"etiqueta\": \"Renta fija\",\n      \"monto\": 300000.0,\n      \"porcentaje\": 100.0\n    }\n  ]\n}"
+            }
+          ]
+        },
+        {
+          "name": "Actualizar portafolio (bloqueo optimista)",
+          "request": {
+            "method": "PUT",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "url": {
+              "raw": "{{baseUrl}}/portafolios/{{portafolio_id}}/",
+              "host": [
+                "{{baseUrl}}"
+              ],
+              "path": [
+                "portafolios",
+                "{{portafolio_id}}",
+                ""
+              ]
+            },
+            "description": "Envía `fecha_modificacion` recibida en el detalle. Si otro usuario guardó antes, responde 409.",
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"nombre\": \"Andino Renta Fija\",\n  \"descripcion\": \"Actualizado.\",\n  \"es_publico\": true,\n  \"fecha_modificacion\": \"{{fecha_modificacion}}\"\n}",
+              "options": {
+                "raw": {
+                  "language": "json"
+                }
+              }
+            }
+          },
+          "response": [
+            {
+              "name": "Respuesta (200)",
+              "originalRequest": {
+                "method": "PUT",
+                "header": [
+                  {
+                    "key": "Content-Type",
+                    "value": "application/json"
+                  }
+                ],
+                "url": {
+                  "raw": "{{baseUrl}}/portafolios/{{portafolio_id}}/",
+                  "host": [
+                    "{{baseUrl}}"
+                  ],
+                  "path": [
+                    "portafolios",
+                    "{{portafolio_id}}",
+                    ""
+                  ]
+                },
+                "body": {
+                  "mode": "raw",
+                  "raw": "{\n  \"nombre\": \"Andino Renta Fija\",\n  \"descripcion\": \"Actualizado.\",\n  \"es_publico\": true,\n  \"fecha_modificacion\": \"{{fecha_modificacion}}\"\n}",
+                  "options": {
+                    "raw": {
+                      "language": "json"
+                    }
+                  }
+                }
+              },
+              "status": "OK",
+              "code": 200,
+              "_postman_previewlanguage": "json",
+              "header": [
+                {
+                  "key": "Content-Type",
+                  "value": "application/json"
+                }
+              ],
+              "body": "{\n  \"id\": 3,\n  \"nombre\": \"Andino Renta Fija\",\n  \"descripcion\": \"Actualizado.\",\n  \"es_publico\": true,\n  \"activo\": true,\n  \"usuario\": 2,\n  \"usuario_nombre\": \"Analista DataPulse\",\n  \"es_propio\": true,\n  \"monto_total_activo\": 300000.0,\n  \"posiciones_activas\": 1,\n  \"fecha_creacion\": \"2026-11-18T20:14:33.459727-05:00\",\n  \"fecha_modificacion\": \"2026-11-18T20:14:33.493590-05:00\",\n  \"posiciones\": [\n    {\n      \"id\": 9,\n      \"portafolio\": 3,\n      \"pais\": \"CO\",\n      \"pais_nombre\": \"Colombia\",\n      \"tipo_activo\": \"RENTA_FIJA\",\n      \"tipo_activo_display\": \"Renta fija\",\n      \"fecha_entrada\": \"2026-10-01\",\n      \"monto_inversion_usd\": \"300000.00\",\n      \"fecha_salida\": null,\n      \"notas\": \"TES 2032 (ampliada)\",\n      \"esta_activa\": true\n    }\n  ],\n  \"metricas\": {\n    \"monto_total_activo\": 300000.0,\n    \"monto_total_historico\": 300000.0,\n    \"limite_monto_activo\": 50000000.0,\n    \"monto_disponible\": 49700000.0,\n    \"posiciones_activas\": 1,\n    \"posiciones_cerradas\": 0,\n    \"riesgo_promedio_ponderado\": 75.0,\n    \"nivel_riesgo\": \"BAJO\",\n    \"color_riesgo\": \"#22c55e\",\n    \"accion_recomendada\": \"Favorable para inversión\",\n    \"distribucion_pais\": [\n      {\n        \"pais\": \"CO\",\n        \"nombre\": \"Colombia\",\n        \"irpc\": 75.0,\n        \"nivel_riesgo\": \"BAJO\",\n        \"color\": \"#22c55e\",\n        \"monto\": 300000.0,\n        \"porcentaje\": 100.0\n      }\n    ],\n    \"distribucion_tipo_activo\": [\n      {\n        \"tipo_activo\": \"RENTA_FIJA\",\n        \"etiqueta\": \"Renta fija\",\n        \"monto\": 300000.0,\n        \"porcentaje\": 100.0\n      }\n    ]\n  }\n}"
+            }
+          ]
+        },
+        {
+          "name": "Edición simultánea → 409",
+          "request": {
+            "method": "PUT",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "url": {
+              "raw": "{{baseUrl}}/portafolios/{{portafolio_id}}/",
+              "host": [
+                "{{baseUrl}}"
+              ],
+              "path": [
+                "portafolios",
+                "{{portafolio_id}}",
+                ""
+              ]
+            },
+            "description": "Escenario 5: se reenvía una `fecha_modificacion` obsoleta (otro usuario ya guardó).",
+            "auth": {
+              "type": "bearer",
+              "bearer": [
+                {
+                  "key": "token",
+                  "value": "{{admin_token}}",
+                  "type": "string"
+                }
+              ]
+            },
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"nombre\": \"Andino Renta Fija\",\n  \"descripcion\": \"Cambio del ADMIN con versión vieja\",\n  \"es_publico\": true,\n  \"fecha_modificacion\": \"2026-11-18T20:14:33.478410-05:00\"\n}",
+              "options": {
+                "raw": {
+                  "language": "json"
+                }
+              }
+            }
+          },
+          "response": [
+            {
+              "name": "Conflicto (409)",
+              "originalRequest": {
+                "method": "PUT",
+                "header": [
+                  {
+                    "key": "Content-Type",
+                    "value": "application/json"
+                  }
+                ],
+                "url": {
+                  "raw": "{{baseUrl}}/portafolios/{{portafolio_id}}/",
+                  "host": [
+                    "{{baseUrl}}"
+                  ],
+                  "path": [
+                    "portafolios",
+                    "{{portafolio_id}}",
+                    ""
+                  ]
+                },
+                "auth": {
+                  "type": "bearer",
+                  "bearer": [
+                    {
+                      "key": "token",
+                      "value": "{{admin_token}}",
+                      "type": "string"
+                    }
+                  ]
+                },
+                "body": {
+                  "mode": "raw",
+                  "raw": "{\n  \"nombre\": \"Andino Renta Fija\",\n  \"descripcion\": \"Cambio del ADMIN con versión vieja\",\n  \"es_publico\": true,\n  \"fecha_modificacion\": \"2026-11-18T20:14:33.478410-05:00\"\n}",
+                  "options": {
+                    "raw": {
+                      "language": "json"
+                    }
+                  }
+                }
+              },
+              "status": "Conflict",
+              "code": 409,
+              "_postman_previewlanguage": "json",
+              "header": [
+                {
+                  "key": "Content-Type",
+                  "value": "application/json"
+                }
+              ],
+              "body": "{\n  \"error\": true,\n  \"codigo\": 409,\n  \"mensaje\": \"El portafolio fue modificado por otro usuario o en otra sesión mientras lo editabas. Recarga el portafolio para ver los cambios más recientes e inténtalo de nuevo.\",\n  \"detalles\": {\n    \"fecha_modificacion_actual\": \"2026-11-18T20:14:33.493590-05:00\"\n  }\n}"
+            }
+          ]
+        },
+        {
+          "name": "Exportar PDF",
+          "request": {
+            "method": "GET",
+            "header": [],
+            "url": {
+              "raw": "{{baseUrl}}/portafolios/{{portafolio_id}}/export/pdf/",
+              "host": [
+                "{{baseUrl}}"
+              ],
+              "path": [
+                "portafolios",
+                "{{portafolio_id}}",
+                "export",
+                "pdf",
+                ""
+              ]
+            },
+            "description": ""
+          },
+          "response": [
+            {
+              "name": "Respuesta (200)",
+              "originalRequest": {
+                "method": "GET",
+                "header": [],
+                "url": {
+                  "raw": "{{baseUrl}}/portafolios/{{portafolio_id}}/export/pdf/",
+                  "host": [
+                    "{{baseUrl}}"
+                  ],
+                  "path": [
+                    "portafolios",
+                    "{{portafolio_id}}",
+                    "export",
+                    "pdf",
+                    ""
+                  ]
+                }
+              },
+              "status": "OK",
+              "code": 200,
+              "_postman_previewlanguage": "text",
+              "header": [
+                {
+                  "key": "Content-Type",
+                  "value": "application/pdf"
+                },
+                {
+                  "key": "Content-Disposition",
+                  "value": "attachment; filename=\"portafolio-andino-renta-fija-20261118.pdf\""
+                }
+              ],
+              "body": "<binario application/pdf · 39001 bytes>"
+            }
+          ]
+        },
+        {
+          "name": "Exportar Excel (.xlsx)",
+          "request": {
+            "method": "GET",
+            "header": [],
+            "url": {
+              "raw": "{{baseUrl}}/portafolios/{{portafolio_id}}/export/xlsx/",
+              "host": [
+                "{{baseUrl}}"
+              ],
+              "path": [
+                "portafolios",
+                "{{portafolio_id}}",
+                "export",
+                "xlsx",
+                ""
+              ]
+            },
+            "description": ""
+          },
+          "response": [
+            {
+              "name": "Respuesta (200)",
+              "originalRequest": {
+                "method": "GET",
+                "header": [],
+                "url": {
+                  "raw": "{{baseUrl}}/portafolios/{{portafolio_id}}/export/xlsx/",
+                  "host": [
+                    "{{baseUrl}}"
+                  ],
+                  "path": [
+                    "portafolios",
+                    "{{portafolio_id}}",
+                    "export",
+                    "xlsx",
+                    ""
+                  ]
+                }
+              },
+              "status": "OK",
+              "code": 200,
+              "_postman_previewlanguage": "text",
+              "header": [
+                {
+                  "key": "Content-Type",
+                  "value": "application/vnd.openxmlformats-officedocument.spreadsheetml.sheet"
+                },
+                {
+                  "key": "Content-Disposition",
+                  "value": "attachment; filename=\"portafolio-andino-renta-fija-20261118.xlsx\""
+                }
+              ],
+              "body": "<binario application/vnd.openxmlformats-officedocument.spreadsheetml.sheet · 10620 bytes>"
+            }
+          ]
+        },
+        {
+          "name": "Cerrar posición",
+          "request": {
+            "method": "DELETE",
+            "header": [],
+            "url": {
+              "raw": "{{baseUrl}}/portafolios/{{portafolio_id}}/posiciones/{{posicion_id}}/",
+              "host": [
+                "{{baseUrl}}"
+              ],
+              "path": [
+                "portafolios",
+                "{{portafolio_id}}",
+                "posiciones",
+                "{{posicion_id}}",
+                ""
+              ]
+            },
+            "description": "Asigna `fecha_salida` (no borra)."
+          },
+          "response": [
+            {
+              "name": "Respuesta (200)",
+              "originalRequest": {
+                "method": "DELETE",
+                "header": [],
+                "url": {
+                  "raw": "{{baseUrl}}/portafolios/{{portafolio_id}}/posiciones/{{posicion_id}}/",
+                  "host": [
+                    "{{baseUrl}}"
+                  ],
+                  "path": [
+                    "portafolios",
+                    "{{portafolio_id}}",
+                    "posiciones",
+                    "{{posicion_id}}",
+                    ""
+                  ]
+                }
+              },
+              "status": "OK",
+              "code": 200,
+              "_postman_previewlanguage": "json",
+              "header": [
+                {
+                  "key": "Content-Type",
+                  "value": "application/json"
+                }
+              ],
+              "body": "{\n  \"id\": 9,\n  \"portafolio\": 3,\n  \"pais\": \"CO\",\n  \"pais_nombre\": \"Colombia\",\n  \"tipo_activo\": \"RENTA_FIJA\",\n  \"tipo_activo_display\": \"Renta fija\",\n  \"fecha_entrada\": \"2026-10-01\",\n  \"monto_inversion_usd\": \"300000.00\",\n  \"fecha_salida\": \"2026-11-18\",\n  \"notas\": \"TES 2032 (ampliada)\",\n  \"esta_activa\": false\n}"
+            }
+          ]
+        },
+        {
+          "name": "VIEWER crea portafolio → 403",
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "url": {
+              "raw": "{{baseUrl}}/portafolios/",
+              "host": [
+                "{{baseUrl}}"
+              ],
+              "path": [
+                "portafolios",
+                ""
+              ]
+            },
+            "description": "Escenario 3.",
+            "auth": {
+              "type": "bearer",
+              "bearer": [
+                {
+                  "key": "token",
+                  "value": "{{viewer_token}}",
+                  "type": "string"
+                }
+              ]
+            },
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"nombre\": \"Intento viewer\",\n  \"descripcion\": \"\",\n  \"es_publico\": false\n}",
+              "options": {
+                "raw": {
+                  "language": "json"
+                }
+              }
+            }
+          },
+          "response": [
+            {
+              "name": "Permisos insuficientes (403)",
+              "originalRequest": {
+                "method": "POST",
+                "header": [
+                  {
+                    "key": "Content-Type",
+                    "value": "application/json"
+                  }
+                ],
+                "url": {
+                  "raw": "{{baseUrl}}/portafolios/",
+                  "host": [
+                    "{{baseUrl}}"
+                  ],
+                  "path": [
+                    "portafolios",
+                    ""
+                  ]
+                },
+                "auth": {
+                  "type": "bearer",
+                  "bearer": [
+                    {
+                      "key": "token",
+                      "value": "{{viewer_token}}",
+                      "type": "string"
+                    }
+                  ]
+                },
+                "body": {
+                  "mode": "raw",
+                  "raw": "{\n  \"nombre\": \"Intento viewer\",\n  \"descripcion\": \"\",\n  \"es_publico\": false\n}",
+                  "options": {
+                    "raw": {
+                      "language": "json"
+                    }
+                  }
+                }
+              },
+              "status": "Forbidden",
+              "code": 403,
+              "_postman_previewlanguage": "json",
+              "header": [
+                {
+                  "key": "Content-Type",
+                  "value": "application/json"
+                }
+              ],
+              "body": "{\n  \"error\": true,\n  \"codigo\": 403,\n  \"mensaje\": \"Los usuarios con rol VIEWER no pueden crear ni editar portafolios.\",\n  \"detalles\": null\n}"
+            }
+          ]
+        },
+        {
+          "name": "Eliminar portafolio (soft delete)",
+          "request": {
+            "method": "DELETE",
+            "header": [],
+            "url": {
+              "raw": "{{baseUrl}}/portafolios/{{portafolio_id}}/",
+              "host": [
+                "{{baseUrl}}"
+              ],
+              "path": [
+                "portafolios",
+                "{{portafolio_id}}",
+                ""
+              ]
+            },
+            "description": ""
+          },
+          "response": [
+            {
+              "name": "Respuesta (204)",
+              "originalRequest": {
+                "method": "DELETE",
+                "header": [],
+                "url": {
+                  "raw": "{{baseUrl}}/portafolios/{{portafolio_id}}/",
+                  "host": [
+                    "{{baseUrl}}"
+                  ],
+                  "path": [
+                    "portafolios",
+                    "{{portafolio_id}}",
+                    ""
+                  ]
+                }
+              },
+              "status": "No Content",
+              "code": 204,
+              "_postman_previewlanguage": "text",
+              "header": [
+                {
+                  "key": "Content-Type",
+                  "value": ""
+                }
+              ],
+              "body": "<binario  · 0 bytes>"
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "name": "Alertas",
+      "description": "Listado con filtros, lectura individual y masiva, resumen.",
+      "item": [
+        {
+          "name": "Listar alertas",
+          "request": {
+            "method": "GET",
+            "header": [],
+            "url": {
+              "raw": "{{baseUrl}}/alertas/?leida=false&severidad=CRITICAL",
+              "host": [
+                "{{baseUrl}}"
+              ],
+              "path": [
+                "alertas",
+                ""
+              ],
+              "query": [
+                {
+                  "key": "leida",
+                  "value": "false"
+                },
+                {
+                  "key": "severidad",
+                  "value": "CRITICAL"
+                }
+              ]
+            },
+            "description": ""
+          },
+          "response": [
+            {
+              "name": "Respuesta (200)",
+              "originalRequest": {
+                "method": "GET",
+                "header": [],
+                "url": {
+                  "raw": "{{baseUrl}}/alertas/?leida=false&severidad=CRITICAL",
+                  "host": [
+                    "{{baseUrl}}"
+                  ],
+                  "path": [
+                    "alertas",
+                    ""
+                  ],
+                  "query": [
+                    {
+                      "key": "leida",
+                      "value": "false"
+                    },
+                    {
+                      "key": "severidad",
+                      "value": "CRITICAL"
+                    }
+                  ]
+                }
+              },
+              "status": "OK",
+              "code": 200,
+              "_postman_previewlanguage": "json",
+              "header": [
+                {
+                  "key": "Content-Type",
+                  "value": "application/json"
+                }
+              ],
+              "body": "{\n  \"count\": 1,\n  \"next\": null,\n  \"previous\": null,\n  \"results\": [\n    {\n      \"id\": 8,\n      \"usuario\": null,\n      \"es_global\": true,\n      \"pais\": \"AR\",\n      \"pais_nombre\": \"Argentina\",\n      \"tipo_alerta\": \"INDICADOR\",\n      \"severidad\": \"CRITICAL\",\n      \"titulo\": \"Hiperinflación en Argentina (2023)\",\n      \"mensaje\": \"La inflación de Argentina en 2023 fue 133.5000 %, superior al umbral de hiperinflación (50 %).\",\n      \"leida\": false,\n      \"fecha_creacion\": \"2026-11-18T20:14:32.010255-05:00\"\n    }\n  ]\n}"
+            }
+          ],
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "const r = pm.response.json().results;",
+                  "if (r.length) pm.collectionVariables.set(\"alerta_id\", r[0].id);"
+                ]
+              }
+            }
+          ]
+        },
+        {
+          "name": "Resumen por tipo y severidad",
+          "request": {
+            "method": "GET",
+            "header": [],
+            "url": {
+              "raw": "{{baseUrl}}/alertas/resumen/",
+              "host": [
+                "{{baseUrl}}"
+              ],
+              "path": [
+                "alertas",
+                "resumen",
+                ""
+              ]
+            },
+            "description": ""
+          },
+          "response": [
+            {
+              "name": "Respuesta (200)",
+              "originalRequest": {
+                "method": "GET",
+                "header": [],
+                "url": {
+                  "raw": "{{baseUrl}}/alertas/resumen/",
+                  "host": [
+                    "{{baseUrl}}"
+                  ],
+                  "path": [
+                    "alertas",
+                    "resumen",
+                    ""
+                  ]
+                }
+              },
+              "status": "OK",
+              "code": 200,
+              "_postman_previewlanguage": "json",
+              "header": [
+                {
+                  "key": "Content-Type",
+                  "value": "application/json"
+                }
+              ],
+              "body": "{\n  \"total\": 8,\n  \"no_leidas\": 8,\n  \"por_tipo\": {\n    \"RIESGO\": 0,\n    \"TIPO_CAMBIO\": 7,\n    \"INDICADOR\": 1\n  },\n  \"por_severidad\": {\n    \"INFO\": 0,\n    \"WARNING\": 7,\n    \"CRITICAL\": 1\n  },\n  \"no_leidas_por_severidad\": {\n    \"INFO\": 0,\n    \"WARNING\": 7,\n    \"CRITICAL\": 1\n  }\n}"
+            }
+          ]
+        },
+        {
+          "name": "Marcar alerta como leída",
+          "request": {
+            "method": "PUT",
+            "header": [],
+            "url": {
+              "raw": "{{baseUrl}}/alertas/{{alerta_id}}/leer/",
+              "host": [
+                "{{baseUrl}}"
+              ],
+              "path": [
+                "alertas",
+                "{{alerta_id}}",
+                "leer",
+                ""
+              ]
+            },
+            "description": ""
+          },
+          "response": [
+            {
+              "name": "Respuesta (200)",
+              "originalRequest": {
+                "method": "PUT",
+                "header": [],
+                "url": {
+                  "raw": "{{baseUrl}}/alertas/{{alerta_id}}/leer/",
+                  "host": [
+                    "{{baseUrl}}"
+                  ],
+                  "path": [
+                    "alertas",
+                    "{{alerta_id}}",
+                    "leer",
+                    ""
+                  ]
+                }
+              },
+              "status": "OK",
+              "code": 200,
+              "_postman_previewlanguage": "json",
+              "header": [
+                {
+                  "key": "Content-Type",
+                  "value": "application/json"
+                }
+              ],
+              "body": "{\n  \"id\": 8,\n  \"usuario\": null,\n  \"es_global\": true,\n  \"pais\": \"AR\",\n  \"pais_nombre\": \"Argentina\",\n  \"tipo_alerta\": \"INDICADOR\",\n  \"severidad\": \"CRITICAL\",\n  \"titulo\": \"Hiperinflación en Argentina (2023)\",\n  \"mensaje\": \"La inflación de Argentina en 2023 fue 133.5000 %, superior al umbral de hiperinflación (50 %).\",\n  \"leida\": true,\n  \"fecha_creacion\": \"2026-11-18T20:14:32.010255-05:00\"\n}"
+            }
+          ]
+        },
+        {
+          "name": "Marcar todas como leídas",
+          "request": {
+            "method": "PUT",
+            "header": [],
+            "url": {
+              "raw": "{{baseUrl}}/alertas/leer-todas/",
+              "host": [
+                "{{baseUrl}}"
+              ],
+              "path": [
+                "alertas",
+                "leer-todas",
+                ""
+              ]
+            },
+            "description": ""
+          },
+          "response": [
+            {
+              "name": "Respuesta (200)",
+              "originalRequest": {
+                "method": "PUT",
+                "header": [],
+                "url": {
+                  "raw": "{{baseUrl}}/alertas/leer-todas/",
+                  "host": [
+                    "{{baseUrl}}"
+                  ],
+                  "path": [
+                    "alertas",
+                    "leer-todas",
+                    ""
+                  ]
+                }
+              },
+              "status": "OK",
+              "code": 200,
+              "_postman_previewlanguage": "json",
+              "header": [
+                {
+                  "key": "Content-Type",
+                  "value": "application/json"
+                }
+              ],
+              "body": "{\n  \"actualizadas\": 7\n}"
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "name": "Dashboard",
+      "description": "KPIs, mapa y tendencias.",
+      "item": [
+        {
+          "name": "KPIs globales",
+          "request": {
+            "method": "GET",
+            "header": [],
+            "url": {
+              "raw": "{{baseUrl}}/dashboard/resumen/",
+              "host": [
+                "{{baseUrl}}"
+              ],
+              "path": [
+                "dashboard",
+                "resumen",
+                ""
+              ]
+            },
+            "description": ""
+          },
+          "response": [
+            {
+              "name": "Respuesta (200)",
+              "originalRequest": {
+                "method": "GET",
+                "header": [],
+                "url": {
+                  "raw": "{{baseUrl}}/dashboard/resumen/",
+                  "host": [
+                    "{{baseUrl}}"
+                  ],
+                  "path": [
+                    "dashboard",
+                    "resumen",
+                    ""
+                  ]
+                }
+              },
+              "status": "OK",
+              "code": 200,
+              "_postman_previewlanguage": "json",
+              "header": [
+                {
+                  "key": "Content-Type",
+                  "value": "application/json"
+                }
+              ],
+              "body": "{\n  \"total_paises\": 10,\n  \"alertas_activas\": 0,\n  \"alertas_criticas\": 0,\n  \"portafolios_usuario\": 2,\n  \"portafolios_publicos\": 1,\n  \"promedio_irpc\": 83.05,\n  \"nivel_promedio\": \"BAJO\",\n  \"color_promedio\": \"#22c55e\",\n  \"distribucion_niveles\": {\n    \"BAJO\": 8,\n    \"MODERADO\": 1,\n    \"ALTO\": 1,\n    \"CRITICO\": 0\n  },\n  \"ultima_actualizacion_irpc\": \"2026-11-19T01:14:33.450576Z\"\n}"
+            }
+          ]
+        },
+        {
+          "name": "Datos del mapa",
+          "request": {
+            "method": "GET",
+            "header": [],
+            "url": {
+              "raw": "{{baseUrl}}/dashboard/mapa/",
+              "host": [
+                "{{baseUrl}}"
+              ],
+              "path": [
+                "dashboard",
+                "mapa",
+                ""
+              ]
+            },
+            "description": ""
+          },
+          "response": [
+            {
+              "name": "Respuesta (200)",
+              "originalRequest": {
+                "method": "GET",
+                "header": [],
+                "url": {
+                  "raw": "{{baseUrl}}/dashboard/mapa/",
+                  "host": [
+                    "{{baseUrl}}"
+                  ],
+                  "path": [
+                    "dashboard",
+                    "mapa",
+                    ""
+                  ]
+                }
+              },
+              "status": "OK",
+              "code": 200,
+              "_postman_previewlanguage": "json",
+              "header": [
+                {
+                  "key": "Content-Type",
+                  "value": "application/json"
+                }
+              ],
+              "body": "{\n  \"paises\": [\n    {\n      \"codigo_iso\": \"AR\",\n      \"nombre\": \"Argentina\",\n      \"region\": \"CONO_SUR\",\n      \"latitud\": -38.4161,\n      \"longitud\": -63.6167,\n      \"bandera_url\": \"https://flagcdn.com/w320/ar.png\",\n      \"irpc\": 44.5,\n      \"nivel_riesgo\": \"ALTO\",\n      \"color\": \"#f97316\",\n      \"accion_recomendada\": \"Reducir exposición\",\n      \"fecha_calculo\": \"2026-11-19T01:14:33.432333Z\",\n      \"alertas_no_leidas\": 0\n    },\n    {\n      \"codigo_iso\": \"BR\",\n      \"nombre\": \"Brasil\",\n      \"region\": \"CONO_SUR\",\n      \"latitud\": -14.235,\n      \"longitud\": -51.9253,\n      \"bandera_url\": \"https://flagcdn.com/w320/br.png\",\n      \"irpc\": 69.0,\n      \"nivel_riesgo\": \"MODERADO\",\n      \"color\": \"#eab308\",\n      \"accion_recomendada\": \"Invertir con precaución\",\n      \"fecha_calculo\": \"2026-11-19T01:14:33.434409Z\",\n      \"alertas_no_leidas\": 0\n    },\n    {\n      \"codigo_iso\": \"CL\",\n      \"nombre\": \"Chile\",\n      \"region\": \"CONO_SUR\",\n      \"latitud\": -35.6751,\n      \"longitud\": -71.543,\n      \"bandera_url\": \"https://flagcdn.com/w320/cl.png\",\n      \"irpc\": 89.5,\n      \"nivel_riesgo\": \"BAJO\",\n      \"color\": \"#22c55e\",\n      \"accion_recomendada\": \"Favorable para inversión\",\n      \"fecha_calculo\": \"2026-11-19T01:14:33.436438Z\",\n      \"alertas_no_leidas\": 0\n    }\n  ],\n  \"leyenda\": [\n    {\n      \"nivel\": \"BAJO\",\n      \"desde\": 75,\n      \"color\": \"#22c55e\",\n      \"accion\": \"Favorable para inversión\"\n    },\n    {\n      \"nivel\": \"MODERADO\",\n      \"desde\": 50,\n      \"color\": \"#eab308\",\n      \"accion\": \"Invertir con precaución\"\n    },\n    {\n      \"nivel\": \"ALTO\",\n      \"desde\": 25,\n      \"color\": \"#f97316\",\n      \"accion\": \"Reducir exposición\"\n    }\n  ]\n}"
+            }
+          ]
+        },
+        {
+          "name": "Tendencias (5 años)",
+          "request": {
+            "method": "GET",
+            "header": [],
+            "url": {
+              "raw": "{{baseUrl}}/dashboard/tendencias/?tipo=INFLACION&paises=CO,BR,MX&anios=5",
+              "host": [
+                "{{baseUrl}}"
+              ],
+              "path": [
+                "dashboard",
+                "tendencias",
+                ""
+              ],
+              "query": [
+                {
+                  "key": "tipo",
+                  "value": "INFLACION"
+                },
+                {
+                  "key": "paises",
+                  "value": "CO,BR,MX"
+                },
+                {
+                  "key": "anios",
+                  "value": "5"
+                }
+              ]
+            },
+            "description": ""
+          },
+          "response": [
+            {
+              "name": "Respuesta (200)",
+              "originalRequest": {
+                "method": "GET",
+                "header": [],
+                "url": {
+                  "raw": "{{baseUrl}}/dashboard/tendencias/?tipo=INFLACION&paises=CO,BR,MX&anios=5",
+                  "host": [
+                    "{{baseUrl}}"
+                  ],
+                  "path": [
+                    "dashboard",
+                    "tendencias",
+                    ""
+                  ],
+                  "query": [
+                    {
+                      "key": "tipo",
+                      "value": "INFLACION"
+                    },
+                    {
+                      "key": "paises",
+                      "value": "CO,BR,MX"
+                    },
+                    {
+                      "key": "anios",
+                      "value": "5"
+                    }
+                  ]
+                }
+              },
+              "status": "OK",
+              "code": 200,
+              "_postman_previewlanguage": "json",
+              "header": [
+                {
+                  "key": "Content-Type",
+                  "value": "application/json"
+                }
+              ],
+              "body": "{\n  \"tipo\": \"INFLACION\",\n  \"tipo_display\": \"Inflación\",\n  \"unidad\": \"PORCENTAJE\",\n  \"anios\": [\n    2019,\n    2020,\n    2021\n  ],\n  \"series\": [\n    {\n      \"pais\": \"BR\",\n      \"nombre\": \"Brasil\",\n      \"valores\": [\n        null,\n        null,\n        8.3\n      ]\n    },\n    {\n      \"pais\": \"CO\",\n      \"nombre\": \"Colombia\",\n      \"valores\": [\n        null,\n        null,\n        3.5\n      ]\n    },\n    {\n      \"pais\": \"MX\",\n      \"nombre\": \"México\",\n      \"valores\": [\n        null,\n        null,\n        5.7\n      ]\n    }\n  ]\n}"
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "name": "Errores de autenticación",
+      "description": "Formato estándar de error ante 401.",
+      "item": [
+        {
+          "name": "Sin token → 401",
+          "request": {
+            "method": "GET",
+            "header": [],
+            "url": {
+              "raw": "{{baseUrl}}/portafolios/",
+              "host": [
+                "{{baseUrl}}"
+              ],
+              "path": [
+                "portafolios",
+                ""
+              ]
+            },
+            "description": "Escenario 2: el frontend cierra sesión y redirige a /auth/login.",
+            "auth": {
+              "type": "noauth"
+            }
+          },
+          "response": [
+            {
+              "name": "No autenticado (401)",
+              "originalRequest": {
+                "method": "GET",
+                "header": [],
+                "url": {
+                  "raw": "{{baseUrl}}/portafolios/",
+                  "host": [
+                    "{{baseUrl}}"
+                  ],
+                  "path": [
+                    "portafolios",
+                    ""
+                  ]
+                },
+                "auth": {
+                  "type": "noauth"
+                }
+              },
+              "status": "Unauthorized",
+              "code": 401,
+              "_postman_previewlanguage": "json",
+              "header": [
+                {
+                  "key": "Content-Type",
+                  "value": "application/json"
+                }
+              ],
+              "body": "{\n  \"error\": true,\n  \"codigo\": 401,\n  \"mensaje\": \"Las credenciales de autenticación no se proveyeron.\",\n  \"detalles\": null\n}"
+            }
+          ]
+        },
+        {
+          "name": "Token expirado/inválido → 401",
+          "request": {
+            "method": "GET",
+            "url": {
+              "raw": "{{baseUrl}}/auth/me/",
+              "host": [
+                "{{baseUrl}}"
+              ],
+              "path": [
+                "auth",
+                "me",
+                ""
+              ]
+            },
+            "auth": {
+              "type": "bearer",
+              "bearer": [
+                {
+                  "key": "token",
+                  "value": "token.invalido.expirado",
+                  "type": "string"
+                }
+              ]
+            }
+          },
+          "response": [
+            {
+              "name": "Token no válido (401)",
+              "code": 401,
+              "status": "Unauthorized",
+              "_postman_previewlanguage": "json",
+              "header": [
+                {
+                  "key": "Content-Type",
+                  "value": "application/json"
+                }
+              ],
+              "body": "{\n  \"error\": true,\n  \"codigo\": 401,\n  \"mensaje\": \"El token dado no es valido para ningun tipo de token\",\n  \"detalles\": {\n    \"code\": \"token_not_valid\",\n    \"messages\": [\n      {\n        \"token_class\": \"AccessToken\",\n        \"token_type\": \"access\",\n        \"message\": \"Token is invalid\"\n      }\n    ]\n  }\n}"
+            }
+          ]
+        }
+      ]
+    }
+  ]
+}
