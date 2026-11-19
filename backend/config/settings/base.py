@@ -92,6 +92,8 @@ MEDIA_ROOT = BASE_DIR / 'media'
 DEFAULT_AUTO_FIELD = 'django.db.models.BigAutoField'
 
 CORS_ALLOWED_ORIGINS = env.list('CORS_ALLOWED_ORIGINS', default=['http://localhost:4200'])
+# El frontend lee el nombre del archivo exportado (PDF/XLSX) desde esta cabecera.
+CORS_EXPOSE_HEADERS = ['Content-Disposition']
 
 REST_FRAMEWORK = {
     'DEFAULT_AUTHENTICATION_CLASSES': (
