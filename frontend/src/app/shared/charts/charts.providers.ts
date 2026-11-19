@@ -1,11 +1,14 @@
 import { EnvironmentProviders, makeEnvironmentProviders } from '@angular/core';
 import {
+  ArcElement,
   CategoryScale,
+  DoughnutController,
   Filler,
   Legend,
   LinearScale,
   LineController,
   LineElement,
+  PieController,
   PointElement,
   Tooltip,
 } from 'chart.js';
@@ -28,6 +31,15 @@ export function proveerGraficos(): EnvironmentProviders {
         Legend,
         Filler,
       ],
+    }),
+  ]);
+}
+
+/** Pie y Donut (distribución de portafolios); provisto solo en la ruta lazy de portafolios. */
+export function proveerGraficosDistribucion(): EnvironmentProviders {
+  return makeEnvironmentProviders([
+    provideCharts({
+      registerables: [PieController, DoughnutController, ArcElement, Tooltip, Legend],
     }),
   ]);
 }

@@ -1,0 +1,82 @@
+.barra {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  justify-content: space-between;
+  gap: 0.5rem 1rem;
+  margin-bottom: 0.5rem;
+
+  h2 {
+    margin: 0;
+    font: var(--mat-sys-title-large);
+  }
+}
+
+.tabla-contenedor {
+  overflow-x: auto;
+
+  table {
+    width: 100%;
+  }
+}
+
+small {
+  color: var(--mat-sys-on-surface-variant);
+}
+
+.num {
+  text-align: right;
+  font-variant-numeric: tabular-nums;
+  white-space: nowrap;
+}
+
+.fecha {
+  white-space: nowrap;
+}
+
+.col-notas {
+  max-width: 240px;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+  color: var(--mat-sys-on-surface-variant);
+}
+
+.acciones {
+  width: 96px;
+  text-align: right;
+  white-space: nowrap;
+}
+
+.estado {
+  padding: 0.125rem 0.5rem;
+  border-radius: 999px;
+  font: var(--mat-sys-label-medium);
+  white-space: nowrap;
+
+  &--activa {
+    background: #dcfce7;
+    color: #14532d;
+  }
+
+  &--cerrada {
+    background: var(--mat-sys-surface-container-highest);
+    color: var(--mat-sys-on-surface-variant);
+  }
+}
+
+.cerrada td {
+  color: var(--mat-sys-on-surface-variant);
+}
+
+.sin-resultados {
+  padding: 2rem 1rem;
+  text-align: center;
+  color: var(--mat-sys-on-surface-variant);
+}
+
+@media (max-width: 1024px) {
+  .col-notas {
+    display: none;
+  }
+}

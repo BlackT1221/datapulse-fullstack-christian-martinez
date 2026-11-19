@@ -26,3 +26,23 @@ export function igualA(campo: string): ValidatorFn {
     return control.value === otro.value ? null : { noCoincide: true };
   };
 }
+
+/** La fecha (`Date`) no puede ser posterior a hoy. */
+export const fechaNoFutura: ValidatorFn = (control: AbstractControl<Date | null>) => {
+  const valor = control.value;
+  if (!(valor instanceof Date) || Number.isNaN(valor.getTime())) {
+    return null;
+  }
+  const finDeHoy = new Date();
+  finDeHoy.setHours(23, 59, 59, 999);
+  return valor.getTime() > finDeHoy.getTime() ? { fechaFutura: true } : null;
+};
+
+/**
+ * Para `MatAutocomplete`: el valor debe ser una opción seleccionada (objeto), no texto libre.
+ * Un texto escrito sin elegir opción produce `{ seleccionInvalida: true }`.
+ */
+export const opcionSeleccionada: ValidatorFn = (control: AbstractControl<unknown>) => {
+  const valor = control.value;
+  return typeof valor === 'string' && valor.trim() !== '' ? { seleccionInvalida: true } : null;
+};

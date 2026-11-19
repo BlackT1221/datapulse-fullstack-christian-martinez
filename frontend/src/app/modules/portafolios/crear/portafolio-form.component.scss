@@ -1,0 +1,95 @@
+:host {
+  display: block;
+  max-width: 760px;
+  margin: 0 auto;
+}
+
+.encabezado {
+  display: flex;
+  align-items: flex-start;
+  gap: 0.5rem;
+  margin-bottom: 1.25rem;
+
+  h1 {
+    font: var(--mat-sys-headline-medium);
+    margin: 0;
+  }
+
+  p {
+    margin: 0.25rem 0 0;
+    color: var(--mat-sys-on-surface-variant);
+  }
+}
+
+.campos {
+  display: flex;
+  flex-direction: column;
+  gap: 0.5rem;
+  padding-top: 1rem;
+}
+
+.disponible {
+  color: #15803d;
+}
+
+.excedido {
+  color: var(--mat-sys-error);
+}
+
+.ayuda {
+  display: block;
+  font: var(--mat-sys-body-small);
+  color: var(--mat-sys-on-surface-variant);
+}
+
+.error-general {
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+  padding: 0.75rem 1rem;
+  border-radius: 8px;
+  background: var(--mat-sys-error-container);
+  color: var(--mat-sys-on-error-container);
+}
+
+.conflicto {
+  display: flex;
+  gap: 0.75rem;
+  margin-bottom: 1rem;
+  padding: 1rem 1.25rem;
+  border: 1px solid #f59e0b;
+  border-left-width: 4px;
+  border-radius: 8px;
+  background: #fffbeb;
+  color: #78350f;
+
+  &__icono {
+    flex: none;
+    color: #b45309;
+  }
+
+  &__cuerpo p {
+    margin: 0.375rem 0 0;
+  }
+
+  &__dato {
+    font: var(--mat-sys-body-small);
+  }
+
+  &__acciones {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 0.5rem;
+    margin-top: 0.75rem;
+  }
+}
+
+.boton-advertencia {
+  --mat-button-filled-container-color: #b45309;
+  --mat-button-filled-label-text-color: #ffffff;
+}
+
+mat-card-actions mat-spinner {
+  display: inline-block;
+  margin-right: 0.5rem;
+}

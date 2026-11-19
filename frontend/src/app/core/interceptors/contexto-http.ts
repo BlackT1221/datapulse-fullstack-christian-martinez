@@ -19,6 +19,11 @@ export function contextoSilencioso(): HttpContext {
   return new HttpContext().set(OMITIR_LOADING, true).set(OMITIR_NOTIFICACION_ERROR, true);
 }
 
+/** Muestra el spinner global pero delega el mensaje de error al componente (formularios). */
+export function contextoSinNotificacion(): HttpContext {
+  return new HttpContext().set(OMITIR_NOTIFICACION_ERROR, true);
+}
+
 export function contextoAutenticacion(): HttpContext {
   return new HttpContext().set(SOLICITUD_AUTENTICACION, true).set(OMITIR_NOTIFICACION_ERROR, true);
 }

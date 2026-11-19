@@ -22,6 +22,17 @@ export const routes: Routes = [
     loadChildren: () => import('./modules/paises/paises.routes').then((m) => m.PAISES_ROUTES),
   },
   {
+    path: 'portafolios',
+    canActivate: [authGuard],
+    loadChildren: () =>
+      import('./modules/portafolios/portafolios.routes').then((m) => m.PORTAFOLIOS_ROUTES),
+  },
+  {
+    path: 'alertas',
+    canActivate: [authGuard],
+    loadChildren: () => import('./modules/alertas/alertas.routes').then((m) => m.ALERTAS_ROUTES),
+  },
+  {
     path: '**',
     title: 'Página no encontrada · DataPulse Latam',
     loadComponent: () =>

@@ -9,3 +9,4 @@ export * from './tipo-cambio.model';
 export * from './usuario.model';
 export * from './catalogos';
 export * from './dashboard.model';
+export * from './reglas-portafolio';

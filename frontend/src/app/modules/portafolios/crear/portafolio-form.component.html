@@ -1,0 +1,138 @@
+<header class="encabezado">
+  <a mat-icon-button routerLink="/portafolios" aria-label="Volver a portafolios">
+    <mat-icon>arrow_back</mat-icon>
+  </a>
+  <div>
+    <h1>{{ editando() ? 'Editar portafolio' : 'Nuevo portafolio' }}</h1>
+    <p>
+      {{
+        editando()
+          ? 'Actualiza los datos generales; las posiciones se gestionan desde el detalle.'
+          : 'Crea un portafolio y luego agrega sus posiciones por país y tipo de activo.'
+      }}
+    </p>
+  </div>
+</header>
+
+@if (cargando() || errorCarga()) {
+  <app-estado-carga
+    [cargando]="cargando()"
+    [error]="errorCarga()"
+    mensajeCarga="Cargando portafolio..."
+    (reintentar)="cargar(portafolioId()!)"
+  />
+} @else {
+  @if (conflicto(); as c) {
+    <div class="conflicto" role="alert" aria-live="assertive">
+      <mat-icon class="conflicto__icono">sync_problem</mat-icon>
+      <div class="conflicto__cuerpo">
+        <strong>Otro usuario modificó este portafolio mientras lo editabas</strong>
+        <p>
+          La versión actual se guardó el {{ c.servidor.fecha_modificacion | date: "d 'de' MMMM, HH:mm:ss" }}.
+          @if (c.campos.length) {
+            Campos que difieren de tu edición: <b>{{ c.campos.join(', ') }}</b>.
+          } @else {
+            Los datos generales coinciden con los tuyos; cambiaron sus posiciones.
+          }
+        </p>
+        @if (c.servidor.nombre !== form.controls.nombre.value) {
+          <p class="conflicto__dato">Nombre actual: «{{ c.servidor.nombre }}»</p>
+        }
+        <div class="conflicto__acciones">
+          <button mat-stroked-button type="button" (click)="usarVersionServidor()">
+            <mat-icon>restore</mat-icon>
+            Descartar mis cambios
+          </button>
+          <button mat-flat-button type="button" class="boton-advertencia" (click)="sobrescribir()">
+            <mat-icon>save_as</mat-icon>
+            Guardar mis cambios de todos modos
+          </button>
+        </div>
+      </div>
+    </div>
+  }
+
+  <mat-card appearance="outlined" class="tarjeta">
+    <form [formGroup]="form" (ngSubmit)="guardar()" novalidate>
+      <mat-card-content class="campos">
+        @if (erroresGenerales().length) {
+          <div class="error-general" role="alert">
+            <mat-icon>error</mat-icon>
+            <span>{{ erroresGenerales().join(' ') }}</span>
+          </div>
+        }
+
+        @let nombre = form.controls.nombre;
+        <mat-form-field appearance="outline">
+          <mat-label>Nombre</mat-label>
+          <input
+            matInput
+            formControlName="nombre"
+            [maxlength]="limites.nombreMax"
+            autocomplete="off"
+            required
+          />
+          @if (nombre.pending) {
+            <mat-spinner matSuffix diameter="18" aria-label="Verificando disponibilidad" />
+          } @else if (nombre.valid && nombre.value) {
+            <mat-icon matSuffix class="disponible" aria-label="Nombre disponible">check_circle</mat-icon>
+          }
+          @if (nombre.pending) {
+            <mat-hint>Verificando disponibilidad del nombre...</mat-hint>
+          }
+          <mat-hint align="end">{{ nombre.value.length }} / {{ limites.nombreMax }}</mat-hint>
+          @if (nombre.hasError('required')) {
+            <mat-error>El nombre es obligatorio.</mat-error>
+          } @else if (nombre.hasError('minlength')) {
+            <mat-error>El nombre debe tener al menos {{ limites.nombreMin }} caracteres.</mat-error>
+          } @else if (nombre.hasError('maxlength')) {
+            <mat-error>El nombre no puede superar {{ limites.nombreMax }} caracteres.</mat-error>
+          } @else if (nombre.hasError('nombreDuplicado')) {
+            <mat-error>{{ nombre.getError('nombreDuplicado') }}</mat-error>
+          } @else if (nombre.hasError('servidor')) {
+            <mat-error>{{ nombre.getError('servidor') }}</mat-error>
+          }
+        </mat-form-field>
+
+        @let descripcion = form.controls.descripcion;
+        <mat-form-field appearance="outline">
+          <mat-label>Descripción (opcional)</mat-label>
+          <textarea
+            matInput
+            formControlName="descripcion"
+            rows="4"
+            placeholder="Estrategia, horizonte de inversión, perfil de riesgo..."
+          ></textarea>
+          <mat-hint align="end" [class.excedido]="longitudDescripcion().length > limites.descripcionMax">
+            {{ longitudDescripcion().length }} / {{ limites.descripcionMax }}
+          </mat-hint>
+          @if (descripcion.hasError('maxlength')) {
+            <mat-error>
+              La descripción no puede superar {{ limites.descripcionMax }} caracteres
+              ({{ descripcion.value.length }} / {{ limites.descripcionMax }}).
+            </mat-error>
+          } @else if (descripcion.hasError('servidor')) {
+            <mat-error>{{ descripcion.getError('servidor') }}</mat-error>
+          }
+        </mat-form-field>
+
+        <mat-checkbox formControlName="es_publico">
+          Portafolio público
+          <span class="ayuda">Los demás usuarios podrán consultarlo (solo tú podrás editarlo).</span>
+        </mat-checkbox>
+      </mat-card-content>
+
+      <mat-card-actions align="end">
+        <button mat-button type="button" (click)="cancelar()">Cancelar</button>
+        <button mat-flat-button type="submit" [disabled]="guardando() || conflicto() !== null">
+          @if (guardando()) {
+            <mat-spinner diameter="18" />
+          } @else {
+            <mat-icon>save</mat-icon>
+          }
+          {{ editando() ? 'Guardar cambios' : 'Crear portafolio' }}
+        </button>
+      </mat-card-actions>
+    </form>
+  </mat-card>
+}
