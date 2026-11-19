@@ -1,0 +1,14 @@
+# Netlify: despliegue del frontend Angular (monorepo).
+[build]
+  base = "frontend"
+  command = "npm run build"
+  publish = "dist/frontend/browser"
+
+[build.environment]
+  NODE_VERSION = "22"
+
+# SPA: las rutas de Angular (/portafolios/7, /alertas…) vuelven a index.html.
+[[redirects]]
+  from = "/*"
+  to = "/index.html"
+  status = 200

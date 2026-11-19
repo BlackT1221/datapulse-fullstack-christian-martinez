@@ -4,7 +4,8 @@ WORKDIR /app
 COPY package.json package-lock.json ./
 RUN npm ci
 COPY . .
-RUN npm run build -- --configuration production
+# "docker" anula el reemplazo de environment: la SPA usa /api a través del proxy nginx.
+RUN npm run build -- --configuration production,docker
 
 # --- Etapa 2: servidor estático ---
 FROM nginx:1.27-alpine
