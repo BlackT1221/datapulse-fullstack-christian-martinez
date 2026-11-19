@@ -1,0 +1,188 @@
+<h2 mat-dialog-title>{{ editando ? 'Editar posición' : 'Nueva posición' }}</h2>
+
+<form [formGroup]="form" (ngSubmit)="guardar()" novalidate>
+  <mat-dialog-content class="contenido">
+    @if (erroresGenerales().length) {
+      <div class="aviso aviso--error" role="alert">
+        <mat-icon>error</mat-icon>
+        <span>{{ erroresGenerales().join(' ') }}</span>
+      </div>
+    }
+
+    <div class="rejilla">
+      @let pais = form.controls.pais;
+      <mat-form-field appearance="outline" subscriptSizing="dynamic" class="completo">
+        <mat-label>País</mat-label>
+        @if (paisSeleccionado()?.bandera_url; as bandera) {
+          <span matIconPrefix class="prefijo-bandera"><img [src]="bandera" alt="" class="bandera" /></span>
+        } @else {
+          <mat-icon matIconPrefix>search</mat-icon>
+        }
+        <input
+          matInput
+          formControlName="pais"
+          [matAutocomplete]="autoPais"
+          placeholder="Escribe para buscar (nombre, ISO o moneda)"
+          autocomplete="off"
+          required
+        />
+        <mat-autocomplete #autoPais="matAutocomplete" [displayWith]="mostrarPais" autoActiveFirstOption>
+          @for (opcion of opcionesPais(); track opcion.codigo_iso) {
+            <mat-option [value]="opcion">
+              <span class="opcion-pais">
+                @if (opcion.bandera_url) {
+                  <img [src]="opcion.bandera_url" alt="" class="bandera" />
+                }
+                <span class="opcion-pais__nombre">{{ opcion.nombre }}</span>
+                <small>{{ opcion.moneda_codigo }}</small>
+                @if (irpcDe(opcion); as irpc) {
+                  <span class="irpc" [style.border-color]="opcion.color_riesgo">IRPC {{ irpc }}</span>
+                }
+              </span>
+            </mat-option>
+          } @empty {
+            <mat-option disabled>Ningún país coincide con la búsqueda.</mat-option>
+          }
+        </mat-autocomplete>
+        @if (pais.hasError('required')) {
+          <mat-error>Selecciona un país.</mat-error>
+        } @else if (pais.hasError('seleccionInvalida')) {
+          <mat-error>Elige un país de la lista de sugerencias.</mat-error>
+        } @else if (pais.hasError('servidor')) {
+          <mat-error>{{ pais.getError('servidor') }}</mat-error>
+        }
+      </mat-form-field>
+
+      @let tipo = form.controls.tipo_activo;
+      <mat-form-field appearance="outline" subscriptSizing="dynamic">
+        <mat-label>Tipo de activo</mat-label>
+        <mat-select formControlName="tipo_activo" [errorStateMatcher]="matcherTipo" required>
+          @for (t of tiposActivo; track t.valor) {
+            <mat-option [value]="t.valor" [disabled]="t.valor === 'MONEDA' && dolarizado()">
+              {{ t.etiqueta }}
+              @if (t.valor === 'MONEDA' && dolarizado()) {
+                <small>(no disponible: economía dolarizada)</small>
+              }
+            </mat-option>
+          }
+        </mat-select>
+        @if (dolarizado() && !form.hasError('monedaDolarizada')) {
+          <mat-hint>Moneda no disponible: {{ paisSeleccionado()?.nombre }} usa USD.</mat-hint>
+        }
+        @if (tipo.hasError('required')) {
+          <mat-error>Selecciona el tipo de activo.</mat-error>
+        } @else if (form.getError('monedaDolarizada'); as e) {
+          <mat-error>No se permite Moneda en {{ e.pais }}: su moneda oficial es el dólar (USD).</mat-error>
+        } @else if (errorIguales(); as e) {
+          <mat-error>Ya hay {{ e.maximo }} posiciones activas de {{ e.tipo }} en {{ e.pais }}.</mat-error>
+        } @else if (tipo.hasError('servidor')) {
+          <mat-error>{{ tipo.getError('servidor') }}</mat-error>
+        }
+      </mat-form-field>
+
+      @let fecha = form.controls.fecha_entrada;
+      <mat-form-field appearance="outline" subscriptSizing="dynamic">
+        <mat-label>Fecha de entrada</mat-label>
+        <input matInput [matDatepicker]="selector" [max]="hoy" formControlName="fecha_entrada" required />
+        <mat-datepicker-toggle matIconSuffix [for]="selector" />
+        <mat-datepicker #selector />
+        <mat-hint>DD/MM/AAAA</mat-hint>
+        @if (fecha.hasError('matDatepickerParse')) {
+          <mat-error>Fecha inválida. Usa el formato DD/MM/AAAA.</mat-error>
+        } @else if (fecha.hasError('required')) {
+          <mat-error>La fecha de entrada es obligatoria.</mat-error>
+        } @else if (fecha.hasError('fechaFutura') || fecha.hasError('matDatepickerMax')) {
+          <mat-error>La fecha de entrada no puede ser futura.</mat-error>
+        } @else if (fecha.hasError('servidor')) {
+          <mat-error>{{ fecha.getError('servidor') }}</mat-error>
+        }
+      </mat-form-field>
+
+      @let monto = form.controls.monto_inversion_usd;
+      <mat-form-field appearance="outline" subscriptSizing="dynamic" floatLabel="always" class="completo">
+        <mat-label>Monto de inversión</mat-label>
+        <span matTextPrefix>US$&nbsp;</span>
+        <input
+          matInput
+          appMontoMiles
+          formControlName="monto_inversion_usd"
+          [errorStateMatcher]="matcherMonto"
+          placeholder="1.000.000"
+          required
+        />
+        <mat-hint>Entre {{ limites.min | usd }} y {{ limites.max | usd }}</mat-hint>
+        @if (monto.hasError('required')) {
+          <mat-error>El monto es obligatorio.</mat-error>
+        } @else if (monto.hasError('min')) {
+          <mat-error>El monto mínimo por posición es {{ limites.min | usd }}.</mat-error>
+        } @else if (monto.hasError('max')) {
+          <mat-error>El monto máximo por posición es {{ limites.max | usd }}.</mat-error>
+        } @else if (errorLimite(); as e) {
+          <mat-error>
+            Supera el límite de {{ e.limite | usd }} del portafolio. Disponible: {{ e.disponible | usd }}.
+          </mat-error>
+        } @else if (monto.hasError('servidor')) {
+          <mat-error>{{ monto.getError('servidor') }}</mat-error>
+        }
+      </mat-form-field>
+
+      @let notas = form.controls.notas;
+      <mat-form-field appearance="outline" subscriptSizing="dynamic" class="completo">
+        <mat-label>Notas (opcional)</mat-label>
+        <textarea matInput formControlName="notas" rows="2"></textarea>
+        <mat-hint align="end">{{ notas.value.length }} / {{ limites.notas }}</mat-hint>
+        @if (notas.hasError('maxlength')) {
+          <mat-error>Las notas no pueden superar {{ limites.notas }} caracteres.</mat-error>
+        }
+      </mat-form-field>
+    </div>
+
+    @let p = proyeccion();
+    <section class="proyeccion" aria-live="polite" aria-label="Proyección del portafolio">
+      <h3>Proyección del portafolio con esta posición</h3>
+      <div class="proyeccion__fila">
+        <span>Monto activo total</span>
+        <strong [class.excede]="p.excede">
+          {{ p.monto_total_activo | usd }} <small>de {{ limites.portafolio | usd: 0 : true }}</small>
+        </strong>
+      </div>
+      <mat-progress-bar
+        mode="determinate"
+        [value]="p.porcentajeLimite"
+        [class.excede]="p.excede"
+        aria-label="Uso del límite de monto activo del portafolio"
+      />
+      <div class="proyeccion__fila">
+        <span>Riesgo promedio ponderado (IRPC)</span>
+        @if (p.riesgo_promedio_ponderado !== null && p.nivel) {
+          <strong>
+            <span class="punto" [style.background-color]="p.nivel.color"></span>
+            {{ p.riesgo_promedio_ponderado | number: '1.1-1' }} · {{ p.nivel.etiqueta }}
+          </strong>
+        } @else {
+          <strong>—</strong>
+        }
+      </div>
+    </section>
+
+    @if (errorIguales(); as e) {
+      <div class="aviso aviso--advertencia" role="alert">
+        <mat-icon>block</mat-icon>
+        <span>
+          Máximo {{ e.maximo }} posiciones activas de {{ e.tipo }} en {{ e.pais }}. Cierra una de las
+          existentes o elige otro tipo de activo.
+        </span>
+      </div>
+    }
+  </mat-dialog-content>
+
+  <mat-dialog-actions align="end">
+    <button mat-button type="button" mat-dialog-close>Cancelar</button>
+    <button mat-flat-button type="submit" [disabled]="guardando()">
+      @if (guardando()) {
+        <mat-spinner diameter="18" class="spinner-boton" />
+      }
+      {{ editando ? 'Guardar cambios' : 'Agregar posición' }}
+    </button>
+  </mat-dialog-actions>
+</form>

@@ -1,0 +1,191 @@
+// Include theming for Angular Material with `mat.theme()`.
+// This Sass mixin will define CSS variables that are used for styling Angular Material
+// components according to the Material 3 design spec.
+// Learn more about theming and how to use it for your application's
+// custom components at https://material.angular.dev/guide/theming
+@use '@angular/material' as mat;
+
+html {
+  height: 100%;
+  @include mat.theme(
+    (
+      color: (
+        primary: mat.$azure-palette,
+        tertiary: mat.$blue-palette,
+      ),
+      typography: Roboto,
+      density: 0,
+    )
+  );
+}
+
+body {
+  // Default the application to a light color theme. This can be changed to
+  // `dark` to enable the dark color theme, or to `light dark` to defer to the
+  // user's system settings.
+  color-scheme: light;
+
+  // Set a default background, font and text colors for the application using
+  // Angular Material's system-level CSS variables. Learn more about these
+  // variables at https://material.angular.dev/guide/system-variables
+  background-color: var(--mat-sys-surface);
+  color: var(--mat-sys-on-surface);
+  font: var(--mat-sys-body-medium);
+
+  // Reset the user agent margin.
+  margin: 0;
+  height: 100%;
+}
+/* You can add global styles to this file, and also import other style files */
+
+// Notificaciones (MatSnackBar) por tipo — ver NotificacionService.
+.notificacion {
+  &--exito {
+    --mat-snack-bar-container-color: #166534;
+    --mat-snack-bar-supporting-text-color: #ffffff;
+    --mat-snack-bar-button-color: #bbf7d0;
+  }
+
+  &--error {
+    --mat-snack-bar-container-color: var(--mat-sys-error);
+    --mat-snack-bar-supporting-text-color: var(--mat-sys-on-error);
+    --mat-snack-bar-button-color: var(--mat-sys-on-error);
+  }
+
+  &--advertencia {
+    --mat-snack-bar-container-color: #92400e;
+    --mat-snack-bar-supporting-text-color: #ffffff;
+    --mat-snack-bar-button-color: #fde68a;
+  }
+}
+
+// Popup del mapa Leaflet (contenido creado fuera de Angular: estilos globales).
+.popup-riesgo {
+  .leaflet-popup-content {
+    margin: 12px 14px;
+    font: var(--mat-sys-body-medium);
+  }
+}
+
+.popup-pais {
+  display: flex;
+  flex-direction: column;
+  gap: 0.375rem;
+  min-width: 190px;
+
+  &__cabecera {
+    display: flex;
+    align-items: center;
+    gap: 0.5rem;
+  }
+
+  &__bandera {
+    width: 28px;
+    height: 19px;
+    object-fit: cover;
+    border-radius: 2px;
+    box-shadow: 0 0 0 1px rgb(0 0 0 / 12%);
+  }
+
+  &__nombre {
+    font: var(--mat-sys-title-small);
+  }
+
+  &__irpc {
+    display: flex;
+    align-items: baseline;
+    gap: 0.5rem;
+  }
+
+  &__valor {
+    font: var(--mat-sys-headline-small);
+    font-weight: 500;
+  }
+
+  &__nivel {
+    display: inline-flex;
+    align-items: center;
+    gap: 0.25rem;
+    color: var(--mat-sys-on-surface-variant);
+  }
+
+  &__punto {
+    width: 10px;
+    height: 10px;
+    border-radius: 50%;
+  }
+
+  &__accion,
+  &__alertas {
+    margin: 0 !important;
+    color: var(--mat-sys-on-surface-variant);
+  }
+
+  &__alertas {
+    color: var(--mat-sys-error);
+  }
+
+  &__boton {
+    margin-top: 0.25rem;
+    padding: 0.4rem 0.75rem;
+    border: 1px solid var(--mat-sys-outline);
+    border-radius: 999px;
+    background: transparent;
+    color: var(--mat-sys-primary);
+    font: var(--mat-sys-label-large);
+    cursor: pointer;
+
+    &:hover,
+    &:focus-visible {
+      background: var(--mat-sys-primary-container);
+    }
+  }
+}
+
+// Utilidades compartidas por portafolios y alertas.
+.sr-only {
+  position: absolute;
+  width: 1px;
+  height: 1px;
+  overflow: hidden;
+  clip-path: inset(50%);
+  white-space: nowrap;
+}
+
+// Badges de visibilidad de portafolio: el icono + texto evitan depender solo del color.
+.badges {
+  display: inline-flex;
+  flex-wrap: wrap;
+  gap: 0.375rem;
+}
+
+.badge {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.25rem;
+  padding: 0.125rem 0.5rem 0.125rem 0.375rem;
+  border-radius: 999px;
+  font: var(--mat-sys-label-medium);
+  white-space: nowrap;
+
+  .mat-icon {
+    width: 14px;
+    height: 14px;
+    font-size: 14px;
+  }
+
+  &--propio {
+    background: var(--mat-sys-primary-container);
+    color: var(--mat-sys-on-primary-container);
+  }
+
+  &--publico {
+    background: #dcfce7;
+    color: #14532d;
+  }
+
+  &--privado {
+    background: var(--mat-sys-surface-container-highest);
+    color: var(--mat-sys-on-surface-variant);
+  }
+}

@@ -1,0 +1,41 @@
+@let m = metricas();
+<div class="kpis" aria-live="polite">
+  <mat-card appearance="outlined" class="kpi">
+    <span class="kpi__etiqueta"><mat-icon aria-hidden="true">payments</mat-icon>Monto total invertido</span>
+    <span class="kpi__valor">{{ m.monto_total_activo | usd }}</span>
+    <mat-progress-bar
+      mode="determinate"
+      [value]="usoLimite()"
+      aria-label="Uso del límite de monto activo"
+    />
+    <span class="kpi__detalle">
+      {{ usoLimite() | number: '1.0-1' }} % del límite · disponible {{ m.monto_disponible | usd: 1 : true }}
+    </span>
+  </mat-card>
+
+  <mat-card appearance="outlined" class="kpi">
+    <span class="kpi__etiqueta"><mat-icon aria-hidden="true">speed</mat-icon>Riesgo promedio ponderado</span>
+    @if (m.riesgo_promedio_ponderado !== null && nivel(); as n) {
+      <span class="kpi__valor">
+        {{ m.riesgo_promedio_ponderado | number: '1.1-1' }}
+        <span class="nivel" [style.--color-nivel]="n.color">{{ n.etiqueta }}</span>
+      </span>
+      <span class="kpi__detalle">IRPC ponderado por monto · {{ n.accion }}</span>
+    } @else {
+      <span class="kpi__valor">—</span>
+      <span class="kpi__detalle">Sin posiciones activas con IRPC calculado</span>
+    }
+  </mat-card>
+
+  <mat-card appearance="outlined" class="kpi">
+    <span class="kpi__etiqueta"><mat-icon aria-hidden="true">stacked_bar_chart</mat-icon>Posiciones</span>
+    <span class="kpi__valor">{{ m.posiciones_activas }} <small>activas</small></span>
+    <span class="kpi__detalle">{{ m.posiciones_cerradas }} cerradas</span>
+  </mat-card>
+
+  <mat-card appearance="outlined" class="kpi">
+    <span class="kpi__etiqueta"><mat-icon aria-hidden="true">history</mat-icon>Monto histórico</span>
+    <span class="kpi__valor">{{ m.monto_total_historico | usd }}</span>
+    <span class="kpi__detalle">Incluye posiciones cerradas</span>
+  </mat-card>
+</div>

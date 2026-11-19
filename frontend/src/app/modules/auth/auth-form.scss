@@ -1,0 +1,92 @@
+:host {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  min-height: calc(100vh - 64px - 3rem);
+  padding: 1rem;
+  box-sizing: border-box;
+}
+
+.tarjeta {
+  width: 100%;
+  max-width: 440px;
+  padding: 1.5rem;
+}
+
+.encabezado {
+  text-align: center;
+  margin-bottom: 1.5rem;
+
+  mat-icon {
+    font-size: 48px;
+    width: 48px;
+    height: 48px;
+    color: var(--mat-sys-primary);
+  }
+
+  h1 {
+    font: var(--mat-sys-headline-small);
+    margin: 0.5rem 0 0.25rem;
+  }
+
+  p {
+    margin: 0;
+    color: var(--mat-sys-on-surface-variant);
+  }
+}
+
+form {
+  display: flex;
+  flex-direction: column;
+  gap: 0.25rem;
+}
+
+mat-form-field {
+  width: 100%;
+}
+
+.aviso {
+  display: flex;
+  align-items: flex-start;
+  gap: 0.5rem;
+  padding: 0.75rem 1rem;
+  margin-bottom: 1rem;
+  border-radius: 8px;
+  font: var(--mat-sys-body-medium);
+
+  &--error {
+    background: var(--mat-sys-error-container);
+    color: var(--mat-sys-on-error-container);
+  }
+
+  &--info {
+    background: var(--mat-sys-secondary-container);
+    color: var(--mat-sys-on-secondary-container);
+  }
+
+  ul {
+    margin: 0;
+    padding-left: 1rem;
+  }
+}
+
+.enviar {
+  margin-top: 0.5rem;
+  height: 48px;
+}
+
+.enviar mat-spinner {
+  display: inline-block;
+  margin-right: 0.5rem;
+}
+
+.pie {
+  text-align: center;
+  margin-top: 1.25rem;
+  color: var(--mat-sys-on-surface-variant);
+
+  a {
+    color: var(--mat-sys-primary);
+    font-weight: 500;
+  }
+}

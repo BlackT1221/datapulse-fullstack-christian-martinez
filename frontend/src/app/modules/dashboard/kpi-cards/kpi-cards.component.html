@@ -1,0 +1,62 @@
+@let r = resumen();
+<section class="kpis" aria-label="Indicadores clave">
+  <mat-card appearance="outlined" class="kpi">
+    <div class="kpi__cabecera">
+      <span class="kpi__titulo">Países monitoreados</span>
+      <mat-icon aria-hidden="true">public</mat-icon>
+    </div>
+    <span class="kpi__valor">{{ r.total_paises }}</span>
+    <span class="kpi__detalle">Latinoamérica · 4 regiones</span>
+  </mat-card>
+
+  <mat-card appearance="outlined" class="kpi">
+    <div class="kpi__cabecera">
+      <span class="kpi__titulo">Alertas activas</span>
+      <mat-icon aria-hidden="true">notifications_active</mat-icon>
+    </div>
+    <span class="kpi__valor">{{ r.alertas_activas }}</span>
+    <span class="kpi__detalle">
+      @if (r.alertas_criticas > 0) {
+        <mat-icon class="icono-critico" aria-hidden="true">error</mat-icon>
+        {{ r.alertas_criticas }} {{ r.alertas_criticas === 1 ? 'crítica' : 'críticas' }} sin leer
+      } @else {
+        Sin alertas críticas pendientes
+      }
+    </span>
+  </mat-card>
+
+  <mat-card appearance="outlined" class="kpi">
+    <div class="kpi__cabecera">
+      <span class="kpi__titulo">Mis portafolios</span>
+      <mat-icon aria-hidden="true">work</mat-icon>
+    </div>
+    <span class="kpi__valor">{{ r.portafolios_usuario }}</span>
+    <span class="kpi__detalle"
+      >{{ r.portafolios_publicos }} {{ r.portafolios_publicos === 1 ? 'público' : 'públicos' }} en
+      la plataforma</span
+    >
+  </mat-card>
+
+  <mat-card appearance="outlined" class="kpi">
+    <div class="kpi__cabecera">
+      <span class="kpi__titulo">Promedio IRPC región</span>
+      <mat-icon aria-hidden="true">speed</mat-icon>
+    </div>
+    <span class="kpi__valor">
+      @if (r.promedio_irpc !== null) {
+        {{ r.promedio_irpc | number: '1.1-1' }}<small>/100</small>
+      } @else {
+        —
+      }
+    </span>
+    <span class="kpi__detalle">
+      @if (nivelPromedio(); as nivel) {
+        <span class="punto" [style.background-color]="nivel.color"></span>
+        Riesgo {{ nivel.etiqueta.toLowerCase() }}
+      }
+      @if (r.ultima_actualizacion_irpc) {
+        · {{ r.ultima_actualizacion_irpc | date: 'd MMM, HH:mm' }}
+      }
+    </span>
+  </mat-card>
+</section>

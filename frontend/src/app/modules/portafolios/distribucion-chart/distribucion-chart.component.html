@@ -1,0 +1,53 @@
+<mat-card appearance="outlined" class="tarjeta">
+  <mat-card-header>
+    <mat-card-title>{{ titulo() }}</mat-card-title>
+    @if (subtitulo()) {
+      <mat-card-subtitle>{{ subtitulo() }}</mat-card-subtitle>
+    }
+  </mat-card-header>
+  <mat-card-content>
+    @if (segmentos().length) {
+      <div class="cuerpo">
+        <div class="lienzo">
+          <canvas
+            baseChart
+            [type]="tipo()"
+            [data]="datos()"
+            [options]="opciones()"
+            role="img"
+            [attr.aria-label]="titulo() + ': ' + descripcion()"
+          ></canvas>
+          @if (tipo() === 'doughnut' && total() !== null) {
+            <div class="centro" aria-hidden="true">
+              <span class="centro__valor">{{ total() | usd: 1 : true }}</span>
+              <span class="centro__etiqueta">activo</span>
+            </div>
+          }
+        </div>
+        <table class="leyenda" [attr.aria-label]="'Tabla: ' + titulo()">
+          <thead class="sr-only">
+            <tr>
+              <th scope="col">Segmento</th>
+              <th scope="col">Monto</th>
+              <th scope="col">Porcentaje</th>
+            </tr>
+          </thead>
+          <tbody>
+            @for (s of segmentos(); track s.clave) {
+              <tr>
+                <th scope="row">
+                  <span class="muestra" [style.background-color]="s.color"></span>
+                  {{ s.etiqueta }}
+                </th>
+                <td>{{ s.monto | usd: 0 : true }}</td>
+                <td class="pct">{{ s.porcentaje | number: '1.1-1' }} %</td>
+              </tr>
+            }
+          </tbody>
+        </table>
+      </div>
+    } @else {
+      <app-estado-carga [vacio]="true" mensajeVacio="Sin posiciones activas para distribuir." />
+    }
+  </mat-card-content>
+</mat-card>

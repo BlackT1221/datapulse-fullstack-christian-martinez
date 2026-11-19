@@ -1,0 +1,32 @@
+<mat-card appearance="outlined" class="tarjeta">
+  <mat-card-header>
+    <mat-card-title>Mapa de riesgo país</mat-card-title>
+    <mat-card-subtitle>IRPC por país · haz clic para ver el detalle</mat-card-subtitle>
+  </mat-card-header>
+  <mat-card-content class="contenido">
+    <div
+      #contenedor
+      class="mapa"
+      role="img"
+      aria-label="Mapa de Latinoamérica coloreado según el IRPC de cada país"
+    ></div>
+    @if (errorGeo()) {
+      <p class="aviso">
+        No se pudieron cargar las geometrías del mapa. Consulta el ranking de países.
+      </p>
+    }
+    <ul class="leyenda" aria-label="Leyenda de niveles de riesgo">
+      @for (item of niveles; track item.nivel) {
+        <li>
+          <span class="muestra" [style.background-color]="item.color"></span>
+          <span class="etiqueta">{{ item.etiqueta }}</span>
+          <span class="rango">≥ {{ item.desde }}</span>
+        </li>
+      }
+      <li>
+        <span class="muestra muestra--neutra"></span>
+        <span class="etiqueta">No monitoreado</span>
+      </li>
+    </ul>
+  </mat-card-content>
+</mat-card>

@@ -1,0 +1,133 @@
+<header class="encabezado">
+  <div>
+    <h1>Alertas</h1>
+    <p>Cambios de riesgo país, movimientos cambiarios y nuevos datos económicos</p>
+  </div>
+  <button mat-flat-button type="button" [disabled]="noLeidas() === 0" (click)="leerTodas()">
+    <mat-icon>done_all</mat-icon>
+    Marcar todas como leídas
+  </button>
+</header>
+
+@if (resumen(); as r) {
+  <section class="resumen" aria-label="Alertas sin leer por severidad">
+    @for (s of opcionesSeveridad; track s.valor) {
+      <div class="resumen__item" [style.--color-severidad]="s.color">
+        <mat-icon aria-hidden="true">{{ s.icono }}</mat-icon>
+        <span class="resumen__valor">{{ r.no_leidas_por_severidad[s.valor] }}</span>
+        <span class="resumen__etiqueta">{{ s.etiqueta }}s sin leer</span>
+      </div>
+    }
+    <div class="resumen__item resumen__item--total">
+      <mat-icon aria-hidden="true">inbox</mat-icon>
+      <span class="resumen__valor">{{ r.total }}</span>
+      <span class="resumen__etiqueta">Total de alertas</span>
+    </div>
+  </section>
+}
+
+<mat-card appearance="outlined">
+  <mat-card-content>
+    <form class="filtros" [formGroup]="form" (submit)="$event.preventDefault()" aria-label="Filtros de alertas">
+      <mat-button-toggle-group formControlName="lectura" aria-label="Estado de lectura" hideSingleSelectionIndicator>
+        <mat-button-toggle value="todas">Todas</mat-button-toggle>
+        <mat-button-toggle value="no_leidas">No leídas</mat-button-toggle>
+        <mat-button-toggle value="leidas">Leídas</mat-button-toggle>
+      </mat-button-toggle-group>
+
+      <mat-form-field appearance="outline" subscriptSizing="dynamic">
+        <mat-label>Tipo</mat-label>
+        <mat-select formControlName="tipo">
+          <mat-option value="">Todos</mat-option>
+          @for (t of tipos; track t.valor) {
+            <mat-option [value]="t.valor">{{ t.etiqueta }}</mat-option>
+          }
+        </mat-select>
+      </mat-form-field>
+
+      <mat-form-field appearance="outline" subscriptSizing="dynamic">
+        <mat-label>Severidad</mat-label>
+        <mat-select formControlName="severidad">
+          <mat-option value="">Todas</mat-option>
+          @for (s of opcionesSeveridad; track s.valor) {
+            <mat-option [value]="s.valor">
+              <mat-icon [style.color]="s.color">{{ s.icono }}</mat-icon>{{ s.etiqueta }}
+            </mat-option>
+          }
+        </mat-select>
+      </mat-form-field>
+
+      @if (filtrosActivos()) {
+        <button mat-button type="button" (click)="limpiarFiltros()">
+          <mat-icon>filter_alt_off</mat-icon>
+          Limpiar filtros
+        </button>
+      }
+      <span class="espaciador"></span>
+      <button mat-stroked-button type="button" (click)="actualizar()" [class.pulso]="hayNuevas()">
+        <mat-icon>refresh</mat-icon>
+        {{ hayNuevas() ? 'Hay alertas nuevas · Actualizar' : 'Actualizar' }}
+      </button>
+    </form>
+
+    @let e = estado();
+    @if (e.alertas.length) {
+      <ul class="lista" [class.recargando]="e.cargando" aria-label="Listado de alertas">
+        @for (a of e.alertas; track a.id) {
+          @let sev = severidades[a.severidad];
+          <li class="alerta" [class.alerta--leida]="a.leida" [style.--color-severidad]="sev.color">
+            <mat-icon class="alerta__icono" [attr.aria-label]="'Severidad ' + sev.etiqueta">{{ sev.icono }}</mat-icon>
+            <div class="alerta__cuerpo">
+              <div class="alerta__cabecera">
+                <strong>{{ a.titulo }}</strong>
+                @if (!a.leida) {
+                  <span class="nueva">Nueva</span>
+                }
+              </div>
+              <p>{{ a.mensaje }}</p>
+              <div class="alerta__meta">
+                <span class="etiqueta-sev">{{ sev.etiqueta }}</span>
+                <span>{{ etiquetaTipo(a.tipo_alerta) }}</span>
+                <a [routerLink]="['/paises', a.pais]">{{ a.pais_nombre }}</a>
+                @if (a.es_global) {
+                  <span>Global</span>
+                }
+                <time [attr.datetime]="a.fecha_creacion">{{ a.fecha_creacion | date: 'd MMM y, HH:mm' }}</time>
+              </div>
+            </div>
+            @if (!a.leida) {
+              <button
+                mat-icon-button
+                type="button"
+                matTooltip="Marcar como leída"
+                aria-label="Marcar como leída"
+                (click)="leer(a)"
+              >
+                <mat-icon>mark_email_read</mat-icon>
+              </button>
+            } @else {
+              <mat-icon class="alerta__leida" matTooltip="Leída" aria-label="Leída">done</mat-icon>
+            }
+          </li>
+        }
+      </ul>
+      <mat-paginator
+        [length]="e.total"
+        [pageIndex]="(e.filtros.page ?? 1) - 1"
+        [pageSize]="e.filtros.page_size ?? 20"
+        [pageSizeOptions]="[10, 20, 50]"
+        (page)="cambiarPagina($event)"
+        aria-label="Paginación de alertas"
+      />
+    } @else {
+      <app-estado-carga
+        [cargando]="e.cargando"
+        [error]="e.error"
+        [vacio]="true"
+        mensajeCarga="Cargando alertas..."
+        mensajeVacio="No hay alertas con los filtros seleccionados."
+        (reintentar)="actualizar()"
+      />
+    }
+  </mat-card-content>
+</mat-card>

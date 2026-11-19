@@ -1,0 +1,54 @@
+.encabezado {
+  margin-bottom: 1.25rem;
+
+  h1 {
+    font: var(--mat-sys-headline-medium);
+    margin: 0;
+  }
+
+  p {
+    margin: 0.25rem 0 0;
+    color: var(--mat-sys-on-surface-variant);
+  }
+}
+
+.dashboard {
+  display: grid;
+  grid-template-columns: minmax(0, 7fr) minmax(0, 5fr);
+  grid-template-areas:
+    'kpis kpis'
+    'mapa ranking'
+    'tendencias tendencias';
+  gap: 1rem;
+}
+
+.area-kpis {
+  grid-area: kpis;
+}
+
+.area-mapa {
+  grid-area: mapa;
+  min-width: 0;
+}
+
+.area-ranking {
+  grid-area: ranking;
+  min-width: 0;
+}
+
+.area-tendencias {
+  grid-area: tendencias;
+  min-width: 0;
+}
+
+// Tablet (≤ 1024px, incluye 768px): una sola columna.
+@media (max-width: 1024px) {
+  .dashboard {
+    grid-template-columns: minmax(0, 1fr);
+    grid-template-areas:
+      'kpis'
+      'mapa'
+      'ranking'
+      'tendencias';
+  }
+}

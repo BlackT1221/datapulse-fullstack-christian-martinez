@@ -1,0 +1,86 @@
+<div class="barra">
+  <h2>Posiciones</h2>
+  @if (cerradas()) {
+    <mat-slide-toggle [checked]="mostrarCerradas()" (change)="mostrarCerradas.set($event.checked)">
+      Mostrar cerradas ({{ cerradas() }})
+    </mat-slide-toggle>
+  }
+</div>
+
+<div class="tabla-contenedor">
+  <table mat-table [dataSource]="visibles()" aria-label="Posiciones del portafolio">
+    <ng-container matColumnDef="pais">
+      <th mat-header-cell *matHeaderCellDef>País</th>
+      <td mat-cell *matCellDef="let p">
+        {{ p.pais_nombre }} <small>{{ p.pais }}</small>
+      </td>
+    </ng-container>
+
+    <ng-container matColumnDef="tipo">
+      <th mat-header-cell *matHeaderCellDef>Tipo de activo</th>
+      <td mat-cell *matCellDef="let p">{{ p.tipo_activo_display }}</td>
+    </ng-container>
+
+    <ng-container matColumnDef="entrada">
+      <th mat-header-cell *matHeaderCellDef>Entrada</th>
+      <td mat-cell *matCellDef="let p" class="fecha">{{ p.fecha_entrada | date: 'd MMM y' : 'UTC' }}</td>
+    </ng-container>
+
+    <ng-container matColumnDef="monto">
+      <th mat-header-cell *matHeaderCellDef class="num">Monto (USD)</th>
+      <td mat-cell *matCellDef="let p" class="num">{{ p.monto_inversion_usd | usd }}</td>
+    </ng-container>
+
+    <ng-container matColumnDef="estado">
+      <th mat-header-cell *matHeaderCellDef>Estado</th>
+      <td mat-cell *matCellDef="let p">
+        @if (p.fecha_salida) {
+          <span class="estado estado--cerrada">
+            Cerrada · {{ p.fecha_salida | date: 'd MMM y' : 'UTC' }}
+          </span>
+        } @else {
+          <span class="estado estado--activa">Activa</span>
+        }
+      </td>
+    </ng-container>
+
+    <ng-container matColumnDef="notas">
+      <th mat-header-cell *matHeaderCellDef class="col-notas">Notas</th>
+      <td mat-cell *matCellDef="let p" class="col-notas" [title]="p.notas">{{ p.notas || '—' }}</td>
+    </ng-container>
+
+    <ng-container matColumnDef="acciones">
+      <th mat-header-cell *matHeaderCellDef><span class="sr-only">Acciones</span></th>
+      <td mat-cell *matCellDef="let p" class="acciones">
+        @if (!p.fecha_salida) {
+          <button
+            mat-icon-button
+            type="button"
+            matTooltip="Editar posición"
+            aria-label="Editar posición"
+            (click)="editar.emit(p)"
+          >
+            <mat-icon>edit</mat-icon>
+          </button>
+          <button
+            mat-icon-button
+            type="button"
+            matTooltip="Cerrar posición"
+            aria-label="Cerrar posición"
+            (click)="cerrar.emit(p)"
+          >
+            <mat-icon>logout</mat-icon>
+          </button>
+        }
+      </td>
+    </ng-container>
+
+    <tr mat-header-row *matHeaderRowDef="columnas()"></tr>
+    <tr mat-row *matRowDef="let p; columns: columnas()" [class.cerrada]="p.fecha_salida"></tr>
+    <tr class="mat-row" *matNoDataRow>
+      <td class="sin-resultados" [attr.colspan]="columnas().length">
+        Este portafolio aún no tiene posiciones activas.
+      </td>
+    </tr>
+  </table>
+</div>

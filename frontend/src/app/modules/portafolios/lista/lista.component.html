@@ -1,0 +1,180 @@
+<header class="encabezado">
+  <div>
+    <h1>Portafolios</h1>
+    <p>Tus portafolios de inversión y los compartidos públicamente por otros analistas</p>
+  </div>
+  <a mat-flat-button routerLink="/portafolios/crear" *appTieneRol="rolesEdicion">
+    <mat-icon>add</mat-icon>
+    Nuevo portafolio
+  </a>
+</header>
+
+<mat-card appearance="outlined">
+  <mat-card-content>
+    <form class="filtros" [formGroup]="form" (submit)="$event.preventDefault()" role="search">
+      <mat-form-field appearance="outline" subscriptSizing="dynamic" class="busqueda">
+        <mat-label>Buscar por nombre o descripción</mat-label>
+        <mat-icon matPrefix>search</mat-icon>
+        <input matInput formControlName="search" maxlength="100" autocomplete="off" />
+        @if (form.controls.search.value) {
+          <button
+            mat-icon-button
+            matSuffix
+            type="button"
+            aria-label="Limpiar búsqueda"
+            (click)="form.controls.search.setValue('')"
+          >
+            <mat-icon>close</mat-icon>
+          </button>
+        }
+      </mat-form-field>
+
+      <mat-button-toggle-group
+        formControlName="alcance"
+        aria-label="Filtrar portafolios por propietario"
+        hideSingleSelectionIndicator
+      >
+        <mat-button-toggle value="todos">Todos</mat-button-toggle>
+        <mat-button-toggle value="propios">Propios</mat-button-toggle>
+        <mat-button-toggle value="otros">De otros usuarios</mat-button-toggle>
+      </mat-button-toggle-group>
+    </form>
+
+    @if (portafolios.hasValue()) {
+      @let resultado = portafolios.value();
+      <div class="tabla-contenedor" [class.recargando]="portafolios.isLoading()">
+        <table
+          mat-table
+          [dataSource]="resultado.results"
+          matSort
+          [matSortActive]="orden().active"
+          [matSortDirection]="orden().direction"
+          (matSortChange)="ordenar($event)"
+          aria-label="Listado de portafolios"
+        >
+          <ng-container matColumnDef="nombre">
+            <th mat-header-cell *matHeaderCellDef mat-sort-header="nombre">Nombre</th>
+            <td mat-cell *matCellDef="let p">
+              <span class="nombre">{{ p.nombre }}</span>
+              @if (p.descripcion) {
+                <span class="descripcion">{{ p.descripcion }}</span>
+              }
+            </td>
+          </ng-container>
+
+          <ng-container matColumnDef="visibilidad">
+            <th mat-header-cell *matHeaderCellDef>Tipo</th>
+            <td mat-cell *matCellDef="let p">
+              <span class="badges">
+                @if (p.es_propio) {
+                  <span class="badge badge--propio">
+                    <mat-icon aria-hidden="true">person</mat-icon>Propio
+                  </span>
+                }
+                @if (p.es_publico) {
+                  <span class="badge badge--publico">
+                    <mat-icon aria-hidden="true">public</mat-icon>Público
+                  </span>
+                } @else {
+                  <span class="badge badge--privado">
+                    <mat-icon aria-hidden="true">lock</mat-icon>Privado
+                  </span>
+                }
+              </span>
+            </td>
+          </ng-container>
+
+          <ng-container matColumnDef="propietario">
+            <th mat-header-cell *matHeaderCellDef class="col-opcional">Propietario</th>
+            <td mat-cell *matCellDef="let p" class="col-opcional">
+              {{ p.es_propio ? 'Tú' : p.usuario_nombre }}
+            </td>
+          </ng-container>
+
+          <ng-container matColumnDef="posiciones">
+            <th mat-header-cell *matHeaderCellDef class="num col-opcional">Posiciones activas</th>
+            <td mat-cell *matCellDef="let p" class="num col-opcional">{{ p.posiciones_activas }}</td>
+          </ng-container>
+
+          <ng-container matColumnDef="monto">
+            <th
+              mat-header-cell
+              *matHeaderCellDef
+              mat-sort-header="total_activo"
+              arrowPosition="before"
+              class="num"
+            >
+              Monto activo
+            </th>
+            <td mat-cell *matCellDef="let p" class="num">{{ p.monto_total_activo | usd }}</td>
+          </ng-container>
+
+          <ng-container matColumnDef="modificado">
+            <th mat-header-cell *matHeaderCellDef mat-sort-header="fecha_modificacion" class="col-opcional">
+              Última modificación
+            </th>
+            <td mat-cell *matCellDef="let p" class="col-opcional">
+              {{ p.fecha_modificacion | date: 'd MMM y, HH:mm' }}
+            </td>
+          </ng-container>
+
+          <ng-container matColumnDef="acciones">
+            <th mat-header-cell *matHeaderCellDef><span class="sr-only">Acciones</span></th>
+            <td mat-cell *matCellDef="let p" class="acciones">
+              @if (editable(p)) {
+                <a
+                  mat-icon-button
+                  [routerLink]="['/portafolios', p.id, 'editar']"
+                  matTooltip="Editar"
+                  aria-label="Editar portafolio"
+                  (click)="$event.stopPropagation()"
+                >
+                  <mat-icon>edit</mat-icon>
+                </a>
+                <button
+                  mat-icon-button
+                  type="button"
+                  matTooltip="Eliminar"
+                  aria-label="Eliminar portafolio"
+                  (click)="eliminar(p, $event)"
+                >
+                  <mat-icon>delete</mat-icon>
+                </button>
+              }
+            </td>
+          </ng-container>
+
+          <tr mat-header-row *matHeaderRowDef="columnas"></tr>
+          <tr
+            mat-row
+            *matRowDef="let p; columns: columnas"
+            class="fila"
+            tabindex="0"
+            (click)="verDetalle(p)"
+            (keydown.enter)="verDetalle(p)"
+          ></tr>
+          <tr class="mat-row" *matNoDataRow>
+            <td class="sin-resultados" [attr.colspan]="columnas.length">
+              No se encontraron portafolios con los filtros aplicados.
+            </td>
+          </tr>
+        </table>
+      </div>
+      <mat-paginator
+        [length]="resultado.count"
+        [pageIndex]="pagina()"
+        [pageSize]="tamano()"
+        [pageSizeOptions]="[10, 20, 50]"
+        (page)="cambiarPagina($event)"
+        aria-label="Paginación de portafolios"
+      />
+    } @else {
+      <app-estado-carga
+        [cargando]="portafolios.isLoading()"
+        [error]="portafolios.status() === 'error'"
+        mensajeCarga="Cargando portafolios..."
+        (reintentar)="portafolios.reload()"
+      />
+    }
+  </mat-card-content>
+</mat-card>

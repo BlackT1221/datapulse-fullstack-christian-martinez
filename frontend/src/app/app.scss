@@ -1,0 +1,65 @@
+.barra {
+  position: sticky;
+  top: 0;
+  z-index: 1000;
+  background: var(--mat-sys-primary);
+  color: var(--mat-sys-on-primary);
+}
+
+.marca {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.5rem;
+  color: inherit;
+  text-decoration: none;
+}
+
+.navegacion {
+  display: flex;
+  gap: 0.25rem;
+  margin-left: 1.5rem;
+
+  .activo {
+    background: rgb(255 255 255 / 16%);
+  }
+}
+
+.espaciador {
+  flex: 1 1 auto;
+}
+
+.barra .mat-mdc-button {
+  --mat-button-text-label-text-color: var(--mat-sys-on-primary);
+}
+
+.info-usuario {
+  display: flex;
+  flex-direction: column;
+  line-height: 1.3;
+
+  small {
+    color: var(--mat-sys-on-surface-variant);
+  }
+}
+
+.contenido {
+  padding: 1.5rem;
+  max-width: 1920px;
+  margin: 0 auto;
+  box-sizing: border-box;
+}
+
+@media (max-width: 768px) {
+  .nombre-usuario,
+  .texto-nav {
+    display: none;
+  }
+
+  .navegacion {
+    margin-left: 0.5rem;
+  }
+
+  .contenido {
+    padding: 1rem;
+  }
+}

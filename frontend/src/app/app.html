@@ -1,0 +1,66 @@
+<app-loading-spinner modo="global" />
+
+<mat-toolbar class="barra">
+  <a class="marca" routerLink="/dashboard">
+    <mat-icon aria-hidden="true">monitoring</mat-icon>
+    <span>{{ titulo }}</span>
+  </a>
+  @if (usuario$ | async; as usuario) {
+    <nav class="navegacion" aria-label="Navegación principal">
+      <a
+        mat-button
+        routerLink="/dashboard"
+        routerLinkActive="activo"
+        ariaCurrentWhenActive="page"
+        aria-label="Dashboard"
+      >
+        <mat-icon>dashboard</mat-icon>
+        <span class="texto-nav">Dashboard</span>
+      </a>
+      <a
+        mat-button
+        routerLink="/paises"
+        routerLinkActive="activo"
+        ariaCurrentWhenActive="page"
+        aria-label="Países"
+      >
+        <mat-icon>public</mat-icon>
+        <span class="texto-nav">Países</span>
+      </a>
+      <a
+        mat-button
+        routerLink="/portafolios"
+        routerLinkActive="activo"
+        ariaCurrentWhenActive="page"
+        aria-label="Portafolios"
+      >
+        <mat-icon>work</mat-icon>
+        <span class="texto-nav">Portafolios</span>
+      </a>
+    </nav>
+  }
+  <span class="espaciador"></span>
+
+  @if (usuario$ | async; as usuario) {
+    <app-alerta-badge />
+    <button mat-button [matMenuTriggerFor]="menuUsuario" aria-label="Menú de usuario">
+      <mat-icon>account_circle</mat-icon>
+      <span class="nombre-usuario">{{ usuario.nombre_completo }}</span>
+    </button>
+    <mat-menu #menuUsuario="matMenu" xPosition="before">
+      <div class="info-usuario" mat-menu-item disabled>
+        <span>{{ usuario.email }}</span>
+        <small>{{ etiquetasRol[usuario.rol] }}</small>
+      </div>
+      <mat-divider />
+      <button mat-menu-item type="button" (click)="cerrarSesion()">
+        <mat-icon>logout</mat-icon>
+        <span>Cerrar sesión</span>
+      </button>
+    </mat-menu>
+  }
+</mat-toolbar>
+
+<main class="contenido">
+  <router-outlet />
+</main>

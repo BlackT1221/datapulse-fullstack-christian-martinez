@@ -1,0 +1,110 @@
+@if (portafolio(); as p) {
+  <header class="encabezado">
+    <a mat-icon-button routerLink="/portafolios" aria-label="Volver a portafolios">
+      <mat-icon>arrow_back</mat-icon>
+    </a>
+    <div class="encabezado__titulo">
+      <h1>{{ p.nombre }}</h1>
+      <div class="meta">
+        <span class="badges">
+          @if (p.es_propio) {
+            <span class="badge badge--propio"><mat-icon aria-hidden="true">person</mat-icon>Propio</span>
+          }
+          @if (p.es_publico) {
+            <span class="badge badge--publico"><mat-icon aria-hidden="true">public</mat-icon>Público</span>
+          } @else {
+            <span class="badge badge--privado"><mat-icon aria-hidden="true">lock</mat-icon>Privado</span>
+          }
+        </span>
+        <span>{{ p.es_propio ? 'Creado por ti' : 'Creado por ' + p.usuario_nombre }}</span>
+        <span>· Modificado {{ p.fecha_modificacion | date: 'd MMM y, HH:mm' }}</span>
+      </div>
+      @if (p.descripcion) {
+        <p class="descripcion">{{ p.descripcion }}</p>
+      }
+    </div>
+
+    <div class="acciones">
+      <button
+        mat-stroked-button
+        type="button"
+        [matMenuTriggerFor]="menuExportar"
+        [disabled]="exportando() !== null"
+      >
+        <mat-icon>{{ exportando() ? 'hourglass_top' : 'download' }}</mat-icon>
+        {{ exportando() ? 'Generando...' : 'Exportar' }}
+      </button>
+      <mat-menu #menuExportar="matMenu" xPosition="before">
+        <button mat-menu-item type="button" (click)="exportar('pdf')">
+          <mat-icon>picture_as_pdf</mat-icon>
+          <span>Reporte PDF (con gráficos)</span>
+        </button>
+        <button mat-menu-item type="button" (click)="exportar('xlsx')">
+          <mat-icon>table_view</mat-icon>
+          <span>Datos en Excel (.xlsx)</span>
+        </button>
+      </mat-menu>
+
+      @if (editable()) {
+        <a mat-stroked-button [routerLink]="['/portafolios', p.id, 'editar']">
+          <mat-icon>edit</mat-icon>
+          Editar
+        </a>
+        <button mat-stroked-button type="button" class="boton-peligro" (click)="eliminar()">
+          <mat-icon>delete</mat-icon>
+          Eliminar
+        </button>
+      }
+    </div>
+  </header>
+
+  @if (metricas(); as m) {
+    <app-metricas-portafolio [metricas]="m" />
+
+    <section class="graficos">
+      <app-distribucion-chart
+        titulo="Distribución por país"
+        subtitulo="Monto activo por mercado"
+        tipo="pie"
+        [segmentos]="segmentosPais()"
+      />
+      <app-distribucion-chart
+        titulo="Distribución por tipo de activo"
+        subtitulo="Monto activo por clase de activo"
+        tipo="doughnut"
+        [segmentos]="segmentosTipo()"
+        [total]="m.monto_total_activo"
+      />
+    </section>
+  }
+
+  <mat-card appearance="outlined">
+    <mat-card-content>
+      <app-tabla-posiciones
+        [posiciones]="p.posiciones"
+        [editable]="editable()"
+        (editar)="abrirFormulario($event)"
+        (cerrar)="cerrarPosicion($event)"
+      />
+      @if (editable()) {
+        <div class="pie-tabla">
+          @if (metricas(); as m) {
+            <span class="disponible">Disponible para invertir: {{ m.monto_disponible | usd }}</span>
+          }
+          <button mat-flat-button type="button" (click)="abrirFormulario()">
+            <mat-icon>add</mat-icon>
+            Nueva posición
+          </button>
+        </div>
+      }
+    </mat-card-content>
+  </mat-card>
+} @else {
+  <app-estado-carga
+    [cargando]="cargando()"
+    [error]="error()"
+    mensajeCarga="Cargando portafolio..."
+    mensajeError="No se pudo cargar el portafolio. Puede que no exista o que no tengas acceso."
+    (reintentar)="cargar()"
+  />
+}
