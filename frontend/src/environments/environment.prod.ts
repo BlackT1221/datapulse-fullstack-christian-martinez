@@ -5,5 +5,5 @@
  */
 export const environment = {
   production: true,
-  apiUrl: 'https://datapulse-backend.onrender.com/api',
+  apiUrl: 'https://datapulse-backend-11qv.onrender.com',
 };
