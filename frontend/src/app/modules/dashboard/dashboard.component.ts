@@ -5,6 +5,8 @@ import { map } from 'rxjs';
 import { DashboardService } from '../../core/services/dashboard.service';
 import { RiesgoService } from '../../core/services/riesgo.service';
 import { EstadoCargaComponent } from '../../shared/components/estado-carga/estado-carga.component';
+import { TieneRolDirective } from '../../shared/directives/tiene-rol.directive';
+import { AccionesAdminComponent } from './acciones-admin/acciones-admin.component';
 import { GraficoTendenciasComponent } from './grafico-tendencias/grafico-tendencias.component';
 import { KpiCardsComponent } from './kpi-cards/kpi-cards.component';
 import { MapaRiesgoComponent } from './mapa-riesgo/mapa-riesgo.component';
@@ -13,11 +15,13 @@ import { TablaRankingComponent } from './tabla-ranking/tabla-ranking.component';
 @Component({
   selector: 'app-dashboard',
   imports: [
+    AccionesAdminComponent,
     EstadoCargaComponent,
     GraficoTendenciasComponent,
     KpiCardsComponent,
     MapaRiesgoComponent,
     TablaRankingComponent,
+    TieneRolDirective,
   ],
   templateUrl: './dashboard.component.html',
   styleUrl: './dashboard.component.scss',

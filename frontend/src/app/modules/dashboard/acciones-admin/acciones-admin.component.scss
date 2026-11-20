@@ -1,0 +1,21 @@
+.acciones {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 0.5rem;
+}
+
+mat-spinner {
+  display: inline-block;
+  margin-right: 0.5rem;
+  vertical-align: middle;
+}
+
+@media (max-width: 600px) {
+  .acciones {
+    width: 100%;
+
+    button {
+      flex: 1 1 auto;
+    }
+  }
+}
