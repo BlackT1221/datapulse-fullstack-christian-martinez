@@ -1,0 +1,29 @@
+<div class="acciones" role="group" aria-label="Acciones de administración">
+  <button
+    mat-stroked-button
+    type="button"
+    [disabled]="enCurso() !== null"
+    (click)="recalcular()"
+  >
+    @if (enCurso() === 'recalcular') {
+      <mat-spinner diameter="18" />
+    } @else {
+      <mat-icon>calculate</mat-icon>
+    }
+    Recalcular IRPC
+  </button>
+
+  <button
+    mat-flat-button
+    type="button"
+    [disabled]="enCurso() !== null"
+    (click)="sincronizar()"
+  >
+    @if (enCurso() === 'sincronizar') {
+      <mat-spinner diameter="18" />
+    } @else {
+      <mat-icon>sync</mat-icon>
+    }
+    {{ enCurso() === 'sincronizar' ? 'Sincronizando...' : 'Sincronizar datos' }}
+  </button>
+</div>

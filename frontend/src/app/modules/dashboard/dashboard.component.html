@@ -3,6 +3,7 @@
     <h1>Panel de riesgo país</h1>
     <p>Monitoreo del Índice de Riesgo País Compuesto (IRPC) en Latinoamérica</p>
   </div>
+  <app-acciones-admin *appTieneRol="['ADMIN']" (completado)="actualizar()" />
 </header>
 
 <div class="dashboard">
