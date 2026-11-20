@@ -34,8 +34,14 @@ export interface FiltrosPais extends ParametrosListado {
   activo?: boolean;
 }
 
+export interface ResultadoSincronizacionFuente {
+  procesados: number;
+  actualizados: number;
+  errores: { contexto: string; mensaje: string }[];
+}
+
 export interface ResultadoSincronizacion {
-  indicadores: Record<string, unknown>;
-  tipos_cambio: Record<string, unknown>;
+  indicadores: ResultadoSincronizacionFuente;
+  tipos_cambio: ResultadoSincronizacionFuente;
   irpc: { calculados: number; errores: unknown[] };
 }
